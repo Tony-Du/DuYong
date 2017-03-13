@@ -1,0 +1,109 @@
+﻿desc rptdata.fact_kesheng_sdk_new_device_hourly; 新设备 小时表
+
+device_key          	string        用户标识（设备唯一标识）
+      	                    
+app_channel_id      	string        渠道ID     	                    
+product_key         	bigint        产品标识    
+	                    
+app_ver_code        	string        APP版本号   
+ 	                    
+upload_unix_time    	bigint        上报时间戳 （如果同一个粒度内有多条数据，以最早的时间戳为准） 
+    	                    
+new_cnt             	bigint        新用户记数（如果该条上报记录是用户上报则记1，否则记0） 根据第一条上报时间 即 成为新设备的时间 来判断的
+     	                    
+become_new_unix_time	bigint        成为新设备的时间戳 （如果同一个粒度内有多条数据，以最早的时间戳为准） 相当于激活时间  为时间戳毫秒数
+     	                    
+src_file_day        	string        分区  数据周期天   	                    
+src_file_hour       	string        分区  数据周期小时   	                    
+grain_ind           	string        分区  粒度标识 000-所有，010-产品，011-产品+版本，100-渠道ID
+
+Question1： 成为新设备的时间戳  become_new_unix_time   和 上报时间戳 upload_unix_time   有什么不同？？？ 上报时间是可以被覆盖的，成为新设备的时间戳等价于激活时间，是固定的
+	 	    
+
+desc  intdata.kesheng_sdk_active_device_hourly;  活跃设备 小时表
+
+device_key          	bigint         用户标识（设备唯一标识）     
+	                    
+app_os_type         	string		   客户端的操作系统类型：“AD”表示安卓客户端，“IOS”表示IOS客户端
+     	                   
+imei                	string         国际移动设备标识    	                    
+user_id             	string              	                    
+imsi                	string			sim卡的imsi号，当值为-988标识为空 
+             	                    
+idfa                	string          广告标识符    	                    
+phone_number        	string         	手机号码   当值为-988标识为空	
+                    
+dw_crt_day          	string          设备key生成的日期       格式：YYYYMMDD 
+dw_crt_hour  	        string            
+dw_upd_day          	string          设备key最近出现的日期   格式：YYYYMMDD
+dw_upd_hour				string
+ 	                    
+src_file_day        	string          分区 数据周期天    	格式：YYYYMMDD                   
+src_file_hour       	string          分区 数据周期小时       格式：YYYYMMDD                      
+
+
+kesheng_sdk_playurl_detail_daily:kesheng_sdk播放获取url时长清单(日) 
+用户标识	DEVICE_KEY	BIGINT
+IMEI		IMEI		STRING
+用户账号	USER_ID		STRING
+IMSI		IMSI		STRING
+IDFA		IDFA		STRING
+渠道ID		APP_CHANNEL_ID	STRING
+产品标识	PRODUCT_KEY		INT
+APP版本号	APP_VER_CODE	STRING
+APP包名		APP_PKG_NAME		STRING
+用户手机号码	PHONE_NUMBER	STRING
+节目ID		CONTENT_ID			STRING
+播放sessionID	PALY_SESSION_ID	STRING
+时长(毫秒)	LOAD_DURTAION_MS	BIGINT
+返回结果	RESULT			STRING  			？？？
+节目URl		PROGRAME_URL	STRING
+流服务IP	STREAM_ID		STRING
+网络类型	NETWORK_TYPE	STRING
+数据周期	SRC_FILE_DAY	STRING
+
+
+
+cpa_active_device_detail_daily:一点接入有效激活清单(日)
+用户标识		DEVICE_KEY		BIGINT			t1
+渠道ID			APP_CHANNEL_ID	STRING			t1	
+激活时间		UPLOAD_TIME		STRING			t1.become_new_unix_time    精确到秒，格式YYYYMMDDHHMISS   
+产品标识		PRODUCT_KEY		INT				t1
+IMEI			IMEI			STRING				t2
+IMSI			IMSI			STRING				t2
+用户账号		USER_ID			STRING				t2
+是否7日留存用户	DAY7_KEEP_DEVICE_FLAG	INT  	    Y：是 N：否 当某天新增用户，在7天后仍然活跃的用户  对应 新设备表 中的device_key
+是否上月留存用户	MONTH1_KEEP_DEVICE_FLAG	INT     上月新增的用户在当前月仍然活跃的用户	成为新设备的时间大于等于上月1号，小于本月1号				
+是否当前周期新增用户	NEW_DEVICE_FLAG	INT         t1.new_cnt
+是否异常行为	ABNORMAL_DEVICE_FLAG	INT         激活时间  是否发生在2:00~5:00之间
+是否使用用戶	PLAY_FLAG		INT                	kesheng_sdk播放获取url时长清单中的device_key不为空  
+数据周期		SRC_FILE_DAY	STRING				t3
+
+
+
+cpa_active_device_detail_monthly:一点接入有效激活清单(月)
+统计月份		STAT_MONTH			STRING			
+咪咕子公司		MIGU_COMPANY_NAME	STRING
+合作伙伴公司名称	COOPERATOR_NAME	STRING
+渠道名称		CHN_NAME			STRING
+渠道ID			APP_CHANNEL_ID		STRING
+激活时间		UPLOAD_TIME			STRING
+产品名称		PRODUCT_NAME		STRING
+IMEI			IMEI				STRING
+IMSI			IMSI				STRING
+是否无账号用户	USER_ID_ISNULL_FLAG	INT
+是否7日留存用户	DAY7_KEEP_DEVICE_FLAG	INT
+是否异常行为	ABNORMAL_DEVICE_FLAG	INT
+是否上月留存用户	MONTH1_KEEP_DEVICE_FLAG	INT		 	
+是否当前周期使用用户	PLAY_DEVICE_FLAG	INT      直接选取日表的play_flag
+数据周期		SRC_FILE_MONTH	STRING
+
+
+
+select
+from_unixtime(bigint(upload_unix_time/1000),'yyyy-MM-dd HH:mm:ss'),
+from_unixtime(bigint(become_new_unix_time/1000),'yyyy-MM-dd HH:mm:ss')
+from
+rptdata.fact_kesheng_sdk_new_device_hourly
+where src_file_day='20161229'
+limit 300;

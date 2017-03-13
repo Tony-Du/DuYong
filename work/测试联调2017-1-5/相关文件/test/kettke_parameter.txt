@@ -1,0 +1,4 @@
+
+
+sudo su - hadoop -c "/opt/data-integration/kitchen.sh -file=#system.BIGDATA_ETL_PATH#/app/cpa_new_active_hourly/main.kjb
+-param:SRC_FILE_DAY=#flow.src_file_day# -param:SRC_FILE_HOUR=#flow.src_file_day# -level=Detailed"

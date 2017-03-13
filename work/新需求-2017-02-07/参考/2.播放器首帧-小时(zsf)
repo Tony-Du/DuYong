@@ -1,0 +1,254 @@
+--create table
+CREATE TABLE intdata.kesheng_sdk_play_first_play(
+       clientId         string,
+        imei            string,
+        udid            string,
+        idfa            string,
+        idfv            string,
+        appVersion      string,
+        apppkg          string,
+        networktype     string,
+        os              string,
+        appchannel      string,
+        installationID  string,
+  
+        mg_msg_time     string,
+        Session         string,
+        LastSession     string,
+        mg_msg_start_time  string,
+        mg_msg_fframe_time string,
+        mg_msg_geturl_time string,
+        networkType        string,
+        mg_msg_program_url string,
+        mg_msg_media_info_type             string,
+        mg_msg_media_info_video_codec      string,
+        mg_msg_media_info_video_resolution string,
+        mg_msg_media_info_video_framerate  string,
+        mg_msg_media_info_video_bitrate    string,
+        mg_msg_media_info_audio_codec      string,
+        mg_msg_media_info_audio_channels   string,
+        mg_msg_media_info_audio_samplerate string,
+       
+        client_ip       string,
+        province_name   string,
+        city_name       string
+
+)
+PARTITIONED BY (src_file_day string, src_file_hour string)
+CLUSTERED BY (province_name) INTO 35 BUCKETS;
+
+
+第一步：
+set mapreduce.job.name=kesheng_sdk_play_first_play_${EXTRACT_DATE}_${EXTRACT_HOUR};
+set hive.enforce.bucketing=true;
+set hive.exec.dynamic.partition.mode=nonstrict;
+set hive.exec.dynamic.partition=true;
+
+INSERT OVERWRITE TABLE intdata.kesheng_sdk_play_first_play PARTITION(src_file_day,src_file_hour)
+  SELECT 
+       clientId,
+        imei,
+        udid,
+        idfa,
+        idfv,
+        appVersion,
+        apppkg,
+        networktype,
+        os,
+        appchannel,
+        installationID,
+        
+        mg_msg_time,
+        session,
+        lastSession,
+        mg_msg_start_time,
+        mg_msg_fframe_time,
+        mg_msg_geturl_time,
+        networkType2,
+        mg_msg_program_url,
+        mg_msg_media_info_type,
+        mg_msg_media_info_video_codec,
+        mg_msg_media_info_video_resolution,
+        mg_msg_media_info_video_framerate,
+        mg_msg_media_info_video_bitrate,
+        mg_msg_media_info_audio_codec,
+        mg_msg_media_info_audio_channels,
+        mg_msg_media_info_audio_samplerate,
+        
+        client_ip,
+        province_name,
+        city_name,
+        src_file_day,
+        src_file_hour
+FROM ods.kesheng_sdk_play_first_play_v c
+WHERE c.src_file_day = '${EXTRACT_DATE}' AND c.src_file_hour='${EXTRACT_HOUR}';
+
+---
+CREATE OR REPLACE VIEW ods.kesheng_sdk_play_first_play_v
+AS
+SELECT s.clientId,        
+       s.imei,        
+       s.udid,        
+       s.idfa,
+       s.idfv,
+       s.appVersion,
+       s.apppkg,
+       s.networktype, 
+       s.os,
+       s.appchannel,
+       s.installationID,       
+       s.client_ip,
+       s.province_name,
+       s.city_name,
+       s.custominfo_type,
+       c.mg_msg_time,
+       c.session,
+       c.lastSession,
+       c.mg_msg_start_time,
+       c.mg_msg_fframe_time,
+       c.mg_msg_geturl_time,
+       c.mg_msg_program_url,
+       c.mg_msg_media_info_type,
+       c.mg_msg_media_info_video_codec,
+       c.mg_msg_media_info_video_resolution,
+       c.mg_msg_media_info_video_framerate,
+       c.mg_msg_media_info_video_bitrate,
+       c.mg_msg_media_info_audio_codec,
+       c.mg_msg_media_info_audio_channels,
+       c.mg_msg_media_info_audio_samplerate,
+       s.src_file_day,
+       s.src_file_hour
+FROM ods.kesheng_sdk_sessioninfo_v s
+LATERAL VIEW json_tuple(s.customInfo_json, 'MG_MSG_TIME', 'Session', 'LastSession', 'MG_MSG_START_TIME', 'MG_MSG_FFRAME_TIME', 'MG_MSG_GETURL_TIME', 'MG_MSG_PROGRAM_URL', 'MG_MSG_MEDIA_INFO_TYPE', 'MG_MSG_MEDIA_INFO_VIDEO_CODEC', 'MG_MSG_MEDIA_INFO_VIDEO_RESOLUTION', 'MG_MSG_MEDIA_INFO_VIDEO_FRAMERATE', 'MG_MSG_MEDIA_INFO_VIDEO_BITRATE', 'MG_MSG_MEDIA_INFO_AUDIO_CODEC', 'MG_MSG_MEDIA_INFO_AUDIO_CHANNELS', 'MG_MSG_MEDIA_INFO_AUDIO_SAMPLERATE') c as mg_msg_time, session, lastSession, mg_msg_start_time, mg_msg_fframe_time, mg_msg_geturl_time, mg_msg_program_url, mg_msg_media_info_type, mg_msg_media_info_video_codec, mg_msg_media_info_video_resolution, mg_msg_media_info_video_framerate, mg_msg_media_info_video_bitrate, mg_msg_media_info_audio_codec, mg_msg_media_info_audio_channels, mg_msg_media_info_audio_samplerate
+WHERE s.custominfo_type = '56000004';
+
+---
+CREATE OR REPLACE VIEW ods.kesheng_sdk_sessioninfo_v
+AS
+SELECT s.clientId,        
+       s.imei,        
+       s.udid,        
+       s.idfa,
+       s.idfv,
+       s.appVersion,
+       s.apppkg,
+       s.networktype, 
+       s.os,
+       s.appchannel,
+       s.installationID,       
+       s.client_ip,
+       s.province_name,
+       s.city_name,
+       s.provider_name,
+       custominfo_json,       
+       custominfo_type,
+       src_file_day
+       src_file_hour
+FROM odsdata.kesheng_sdk_sessioninfo s;
+
+--
+CREATE TABLE odsdata.kesheng_sdk_sessioninfo(
+        rowkey          string,
+        clientId        string,
+        imei            string,
+        udid            string,
+        idfa            string,
+        idfv            string,
+        appVersion      string,
+        apppkg          string,
+        networktype     string,
+        os              string,
+        appchannel      string,
+        installationID  string,
+        client_ip       string,
+        province_name   string,
+        city_name       string,
+        provider_name   string,
+        custominfo_pos  string,
+        custominfo_json string
+)
+PARTITIONED BY(src_file_day string, src_file_hour string, custominfo_type string);
+
+/*
+add jar /opt/cloudera/parcels/CDH/lib/hive/lib/hive-contrib.jar;
+set mapreduce.job.name=odsdata.kesheng_sdk_sessioninfo_${EXTRACT_DATE};
+set hive.enforce.bucketing=true;
+set hive.exec.dynamic.partition.mode=nonstrict;
+set hive.exec.dynamic.partition=true;
+INSERT OVERWRITE TABLE odsdata.kesheng_sdk_sessioninfo PARTITION(src_file_day,src_file_hour,custominfo_type)
+  SELECT
+      v.imei,
+      v.udid,
+      v.idfa,
+      v.idfv,
+      v.appVersion,
+      v.networktype, 
+      v.apppkg,
+      v.clientId,
+      v.client_ip,
+      e.province_name,
+      e.city_name,
+      e.provider_name,
+      v.custominfo_pos,
+      v.customInfo_json,
+      v.src_file_day,
+      v.src_file_hour,
+      v.custominfo_type
+FROM ods.kesheng_sdk_json_sessioninfo_v v LEFT JOIN mscdata.ip_city_provider_map e ON (regexp_extract(v.client_ip, '(.*)(\\..*)', 1) = e.ip_segment)
+WHERE src_file_day = v.src_file_day AND src_file_hour= v.src_file_hour;
+
+
+
+---
+CREATE OR REPLACE VIEW ods.kesheng_sdk_json_sessioninfo_v
+AS
+SELECT concat(s.INPUT__FILE__NAME, ':', s.BLOCK__OFFSET__INSIDE__FILE) as rowkey,
+       d.clientId,
+       d.imei,
+       d.udid,
+       d.idfa,
+       d.idfv,
+       d.appVersion,
+       d.apppkg,
+       d.networktype, 
+       d.os,
+       d.appchannel,
+       d.installationID,
+       c.custominfo_pos,
+       c.customInfo_json,
+       c1.custominfo_type,
+       s.client_ip,
+       s.extract_date_label as src_file_day,
+       s.extract_hour_label as src_file_hour
+FROM ods.kesheng_sdk_json_ex s
+LATERAL VIEW json_tuple(s.json, 'sdkSessionInfo') p as sdkSessionInfo
+LATERAL VIEW json_tuple(p.sdkSessionInfo, 'clientId', 'imei', 'udid', 'idfa', 'idfv', 'appVersion', 'apppkg', 'networktype', 'os', 'appchannel', 'installationID') d AS clientId, imei, udid, idfa, idfv, appVersion, apppkg, networktype, os, appchannel, installationID
+LATERAL VIEW json_tuple(translate(s.json, '\u0000', ''), 'customInfo') p as customInfo
+LATERAL VIEW posexplode(split(regexp_replace(regexp_replace(p.customInfo,'\\}\\,\\{','\\}\\|\\|\\{'),'\\[|\\]',''), '\\|\\|')) c as custominfo_pos, customInfo_json
+LATERAL VIEW json_tuple(c.customInfo_json, 'type') c1 as custominfo_type
+WHERE c1.custominfo_type  IS NOT NULL AND LENGTH(c1.custominfo_type) <= 255;
+
+--
+--add jar /opt/cloudera/parcels/CDH/lib/hive/lib/hive-contrib.jar;
+drop table ods.kesheng_sdk_json_ex;
+CREATE EXTERNAL TABLE ods.kesheng_sdk_json_ex (
+    json string,
+    client_ip string
+)
+PARTITIONED BY (extract_date_label string)
+ROW FORMAT SERDE 'org.apache.hadoop.hive.contrib.serde2.MultiDelimitSerDe' 
+WITH SERDEPROPERTIES ("field.delim"="||")
+LOCATION '/user/hadoop/ods/kesheng/';
+
+hive> desc ods.kesheng_sdk_json_ex;
+OK
+json                    string                  from deserializer   
+client_ip               string                  from deserializer   
+extract_date_label      string                                      
+extract_hour_label      string                                      
+                 
+# Partition Information          
+# col_name              data_type               comment             
+                 
+extract_date_label      string                                      
+extract_hour_label      string   

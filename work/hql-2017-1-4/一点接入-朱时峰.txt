@@ -1,0 +1,244 @@
+-- 一点接入有效激活清单(月)
+注意：
+1.app的分隔符是|
+2.不用parquet格式存储
+drop table if exists app.cpa_active_device_detail_monthly;
+
+create table app.cpa_active_device_detail_monthly
+(
+   stat_month           string,
+   migu_company_name    string,
+   cooperator_name      string,
+   chn_name             string,
+   app_channel_id       string,
+   become_new_time   bigint,
+   product_name         string,
+   imei                 string,
+   imsi                 string,
+   user_id_isnull_flag  tinyint,
+   day7_keep_device_flag tinyint,
+   abnormal_device_flag tinyint,
+   month1_keep_device_flag tinyint,
+   play_device_flag     tinyint
+)partitioned by (src_file_month    string)
+row format delimited fields terminated by '|';
+
+
+set mapreduce.job.name=app.cpa_active_device_detail_monthly_${MONTH_START_DAY}_${MONTH_END_DAY};
+
+set hive.exec.dynamic.partition.mode=nonstrict;
+set hive.exec.dynamic.partition=true;
+set hive.merge.mapredfiles=true;
+
+insert overwrite table app.cpa_active_device_detail_monthly partition(src_file_month)
+select substr('${MONTH_START_DAY}',1,6) stat_month
+      ,'咪咕视讯' migu_company_name
+      ,d1.cooperator_name
+      ,nvl(d2.chn_name,'') chn_name
+      ,t1.app_channel_id
+      ,from_unixtime(bigint(t1.become_new_unix_time/1000),'yyyyMMddHHmmss') become_new_time
+      ,d1.product_name
+      ,t1.imei
+      ,t1.imsi
+      ,t1.user_id_isnull_flag
+      ,t1.day7_keep_device_flag
+      ,t1.abnormal_device_flag
+      ,t1.month1_keep_device_flag
+      ,t1.play_device_flag
+      ,substr('${MONTH_START_DAY}',1,6) src_file_month
+  from (select a.app_channel_id
+              ,min(a.become_new_unix_time) become_new_unix_time
+              ,a.imei
+              ,a.imsi
+              ,max(if(a.user_id = '-998',1,0)) user_id_isnull_flag
+              ,max(a.day7_keep_device_flag) day7_keep_device_flag
+              ,max(a.abnormal_device_flag) abnormal_device_flag
+              ,max(a.month1_keep_device_flag) month1_keep_device_flag
+              ,max(a.play_device_flag) play_device_flag
+          from rptdata.fact_cpa_active_device_detail_daily a
+         where a.src_file_day >= '${MONTH_START_DAY}'
+           and a.src_file_day <= '${MONTH_END_DAY}'
+           and (a.new_device_flag + a.month1_keep_device_flag > 0)
+         group by a.app_channel_id, a .imei, a.imsi
+        ) t1
+ left join mscdata.dim_cpa_channel2cooperator d1
+    on (t1.app_channel_id = d1.channel_id)
+  left join rptdata.dim_chn d2
+    on (t1.app_channel_id = d2.chn_id);
+
+
+tostring(adddays(addmonths(todate(#flow.startDataTime#+'01', 'yyyyMMdd'),1),-1),'yyyyMMdd')  -level=Detail'
+	
+tostring(adddays(addmonths(todate(#flow.startDataTime#+'01', 'yyyyMMdd'), 1),-1) ,'yyyyMMdd')
+	
+	
+/opt/data-integration/kitchen.sh -file=/bigdata/etl/app/cpa_active_device_detail_monthly/main.kjb -param:MONTH_START_DAY=20161201 -param:MONTH_END_DAY=20161231 -level=Detail
+
+
+
+/opt/data-integration/kitchen.sh -file=/bigdata/etl/rpt/rptdata/dim_net_type/app.cpa_active_device_detail_monthly.kjb -param:MONTH_START_DAY=20161201 -param:MONTH_END_DAY=20161231  -level=Detailed
+	
+bdi的外部命令配置：
+sudo su - hadoop -c "/opt/data-integration/kitchen.sh -file=/bigdata/etl/app/cpa_active_device_detail_monthly/main.kjb -param:MONTH_START_DAY=#flow.month_start_day# -param:MONTH_END_DAY=#flow.month_end_day#"
+
+sudo su - hadoop -c "/opt/data-integration/kitchen.sh -file=/bigdata/etl/app/cpa_active_device_detail_monthly/main.kjb -param:MONTH_START_DAY=#flow.month_start_day# -param:MONTH_END_DAY=#flow.month_end_day#  -level=Detail"
+
+bdi传入参数：
+tostring(adddays(addmonths(todate(#flow.startDataTime#+'01', 'yyyyMMdd'), 1),-1) ,'yyyyMMdd')
+
+创建目录：
+mkdir /bigdata/etl/app/cpa_active_device_detail_monthly
+
+用户名及密码??
+--#########################################################################################################---
+-- 一点接入结算明细(月)
+drop table if exists app.cpa_settlement_detail_monthly;
+
+create table app.cpa_settlement_detail_monthly
+(
+   stat_month           string,
+   migu_company_name    string,
+   cooperator_name      string,
+   chn_name             string,
+   app_channel_id       string,
+   add_device_num       bigint,
+   month1_keep_device_num bigint,
+   add_device_price     string,
+   month1_keep_price    string,
+   amount               string,
+   tax_rate             string
+)partitioned by (src_file_month    string)
+row format delimited fields terminated by '|';
+
+
+
+set mapreduce.job.name=app.cpa_settlement_detail_monthly_${MONTH_START_DAY}_${MONTH_END_DAY};
+
+set hive.exec.dynamic.partition.mode=nonstrict;
+set hive.exec.dynamic.partition=true;
+set hive.merge.mapredfiles=true;
+
+insert overwrite table app.cpa_settlement_detail_monthly partition(src_file_month)
+select substr('${MONTH_START_DAY}',1,6) stat_month
+      ,'咪咕视讯' migu_company_name
+      ,d1.cooperator_name
+      ,nvl(d2.chn_name,'') chn_name
+      ,t1.app_channel_id
+      ,t1.add_device_num
+      ,t1.month1_keep_device_num
+      ,'' add_device_price
+      ,'' month1_keep_price
+      ,'' amount
+      ,'' tax_rate
+      ,substr('${MONTH_START_DAY}',1,6) src_file_month
+  from (select a.app_channel_id
+              ,sum(a.new_device_flag) add_device_num
+              ,count(distinct if(a.month1_keep_device_flag = 1, a.device_key, null)) month1_keep_device_num
+          from rptdata.fact_cpa_active_device_detail_daily a
+         where a.src_file_day >= '${MONTH_START_DAY}'
+           and a.src_file_day <= '${MONTH_END_DAY}'
+           and (a.new_device_flag + month1_keep_device_flag > 0)
+           and a.abnormal_device_flag = 0
+         group by a.app_channel_id
+        ) t1
+ left join mscdata.dim_cpa_channel2cooperator d1
+    on (t1.app_channel_id = d1.channel_id)
+  left join rptdata.dim_chn d2
+    on (t1.app_channel_id = d2.chn_id)
+;
+
+/opt/data-integration/kitchen.sh -file=/bigdata/etl/app/cpa_settlement_detail_monthly/main.kjb -param:MONTH_START_DAY=20161201 -param:MONTH_END_DAY=20161231 -level=Detail
+
+/opt/data-integration/kitchen.sh -file=/bigdata/etl/rpt/rptdata/dim_net_type/app.cpa_settlement_detail_monthly.kjb -param:MONTH_START_DAY=20161201 -param:MONTH_END_DAY=20161231  -level=Detailed
+
+bdi的外部命令配置：
+sudo su - hadoop -c "/opt/data-integration/kitchen.sh -file=/bigdata/etl/app/cpa_settlement_detail_monthly/main.kjb -param:MONTH_START_DAY=#flow.month_start_day# -param:MONTH_END_DAY=#flow.month_end_day#  -level=Detail"
+
+
+创建目录：
+mkdir /bigdata/etl/app/cpa_active_device_detail_monthly
+
+用户名及密码??
+--#########################################################################################################---
+-- 一点接入结算主表(月)
+drop table if exists app.cpa_settlement_total_monthly;
+
+create table app.cpa_settlement_total_monthly
+(
+   stat_month           string,
+   migu_company_name    string,
+   cooperator_name      string,
+   add_device_num       bigint,
+   month1_keep_device_num bigint,
+   add_device_price     string,
+   month1_keep_price    string,
+   amount               string,
+   tax_rate             string
+)partitioned by (src_file_month    string)
+row format delimited fields terminated by '|';
+
+set mapreduce.job.name=app.cpa_settlement_total_monthly_{SRC_FILE_MONTH};
+set hive.merge.mapredfiles=true;
+
+insert overwrite table app.cpa_settlement_total_monthly partition(src_file_month='${SRC_FILE_MONTH}')
+select '${SRC_FILE_MONTH}' stat_month
+      ,'咪咕视讯' migu_company_name
+      ,t1.cooperator_name
+      ,sum(t1.add_device_num) add_device_num
+      ,sum(t1.month1_keep_device_num) month1_keep_device_num
+      ,'' add_device_price
+      ,'' month1_keep_price
+      ,'' amount
+      ,'' tax_rate
+  from app.cpa_settlement_detail_monthly t1
+ where t1.src_file_month = '${SRC_FILE_MONTH}'
+ group by t1.cooperator_name;
+
+ /opt/data-integration/kitchen.sh -file=/bigdata/etl/app/cpa_settlement_total_monthly/main.kjb -param:SRC_FILE_MONTH=201612 -level=Detail
+ 
+ sudo su - hadoop -c "/opt/data-integration/kitchen.sh -file=/bigdata/etl/app/cpa_settlement_detail_monthly/main.kjb -param:MONTH_START_DAY=#flow.month_start_day# -param:MONTH_END_DAY=#flow.month_end_day#  -level=Detail"
+ 
+ sudo su - hadoop -c "/opt/data-integration/kitchen.sh -file=/bigdata/etl/app/cpa_settlement_total_monthly/main.kjb -param:SRC_FILE_MONTH=#flow.startDataTime# -level=Detailed"
+ 
+ 
+ /opt/data-integration/kitchen.sh -file=/bigdata/etl/rpt/rptdata/dim_net_type/app.cpa_settlement_total_monthly.kjb -param:SRC_FILE_MONTH=201612 -level=Detailed
+ 
+ 
+ 
+ 
+ 数据抽取和上传ftp的脚本
+ sudo su - hadoop -c  "sh /bigdata/etl/common/cpa_copy_hdfs_to_ftp/main.sh #flow.hdfs_path# #flow.local_path# #flow.file_name#"
+ 
+ 第一个：有效激活明细表
+ hdfs_path  /user/hive/warehouse/app.db/cpa_active_device_detail_monthly/src_file_month=#flow.startDataTime#
+ 
+local_path
+/mnt/cpa/ftp/#tostring(#adddays(#addmonths(#todate(#flow.startDataTime#+'01', 'yyyyMMdd')#, 1)#,-1)# ,'yyyyMMdd')#/month
+
+file_name
+CPA_ACTIVE_DETAIL_#flow.startDataTime#.013
+ 
+ 
+ 
+ 第二个：有效
+ hdfs_path
+/user/hive/warehouse/app.db/cpa_settlement_detail_monthly/src_file_month=#flow.startDataTime#
+
+local_path
+/mnt/cpa/ftp/
+
+file_name
+CPA_DETAIL_#flow.startDataTime#.013
+ 
+ 第三个；主表
+hdfs_path
+/user/hive/warehouse/app.db/cpa_settlement_total_monthly/src_file_month=#flow.startDataTime#
+
+local_path
+/mnt/cpa/ftp/
+file_name
+CPA_MAIN_#flow.startDataTime#.013
+ 
+ 
+ 
+ 

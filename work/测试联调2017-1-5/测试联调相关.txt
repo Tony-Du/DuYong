@@ -1,0 +1,58 @@
+1、用户device_key生成与用户活跃设备及小时指标统计
+
+   -- intdata.kesheng_sdk_session_start
+
+   intdata.kesheng_sdk_active_device_hourly
+   intdata.kesheng_sdk_imei_user_device_key
+   intdata.kesheng_sdk_imei_imsi_device_key 
+   intdata.kesheng_sdk_idfa_user_device_key
+
+   app.cpa_new_active_hourly
+   依赖--rptdata.fact_kesheng_sdk_new_active_hourly
+         依赖--rptdata.fact_kesheng_sdk_session_start_hourly：依赖intdata.kesheng_sdk_active_device_hourly & intdata.kesheng_sdk_session_start
+ 	       rptdata.fact_kesheng_sdk_new_user_hourly：依赖intdata.kesheng_sdk_session_start
+               rptdata.fact_kesheng_sdk_new_device_hourly(修改)：依赖intdata.kesheng_sdk_active_device_hourly
+	       
+======一点接入==============================================================
+   app.cpa_active_device_detail_monthly
+   app.cpa_settlement_detail_monthly
+   app.cpa_settlement_total_monthly
+	依赖-- rptdata.fact_cpa_active_device_detail_daily (wuminglei)
+	    依赖--rptdata.fact_kesheng_sdk_new_device_hourly; 
+		  intdata.kesheng_sdk_active_device_hourly; 
+		  fact_kesheng_sdk_playurl_detail_daily;
+
+
+========================================================================================================================================
+2、用户手机型号分布统计
+   intdata.kesheng_sdk_device_key2phone_mode
+   rptdata.fact_kesheng_sdk_phone_mode_daily 
+   app.cpa_phone_mode_daily
+3、用户session_start/session_end/exception及日指标统计表
+   rptdata.fact_kesheng_sdk_session_start_hourly
+   rptdata.fact_kesheng_sdk_session_end_daily
+   rptdata.fact_kesheng_sdk_exception_daily
+   rptdata.fact_kesheng_sdk_session_error_daily 
+   rptdata.fact_kesheng_sdk_new_active_daily
+   app.cpa_all_ind_daily
+4、新设备与新账号表及周/月指标统计
+   rptdata.fact_kesheng_sdk_new_user_hourly 
+   rptdata.fact_kesheng_sdk_new_device_hourly 
+   rptdata.fact_kesheng_sdk_new_active_weekly
+   rptdata.fact_kesheng_sdk_new_active_monthly
+   app.cpa_new_active_monthly 
+   app.cpa_new_active_weekly 
+5、留存率指标统计  
+   rptdata.fact_kesheng_sdk_device_retention_daily 
+   rptdata.fact_kesheng_sdk_device_retention_weekly
+   rptdata.fact_kesheng_sdk_device_retention_monthly
+   app.cpa_user_retention_daily
+   app.cpa_user_retention_monthly
+   app.cpa_user_retention_weekly
+
+
+新增用户占比：当前周期的新增用户/当前周期的活跃用户数
+
+活跃用户：启动过一次的用户即视为活跃用户，包括新用户与老用户
+
+次日留存率：两日前的新增用户且在一日前留存的用户/两日前的新增用户
