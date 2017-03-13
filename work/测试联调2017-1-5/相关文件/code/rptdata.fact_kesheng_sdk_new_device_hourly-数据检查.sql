@@ -172,7 +172,7 @@ GROUP BY device_key, app_channel_id, product_key, app_ver_code, src_file_day, sr
 -- 测试：
 select count(device_key), count(distinct device_key) from stg.fact_kesheng_sdk_new_device_hourly_01 where src_file_day = '20170116' and src_file_hour = '12';
 		 
-	-- ========================================================================================================================================================== --	 
+-- ========================================================================================================================================================== --	 
 
 INSERT OVERWRITE TABLE stg.fact_kesheng_sdk_new_device_hourly_02 PARTITION(grain_ind)	-- 所有产品的新增用户
 select
@@ -315,7 +315,7 @@ from stg.fact_kesheng_sdk_new_device_hourly_02 t1
                           )      
                 group by product_key,device_key) t2
      on (t1.device_key = t2.device_key and t1.product_key = t2.product_key) -- 当不符合该条件时，t2表中的字段为null，即在该维度下 为新用户。
-where t1.grain_ind = '010';
+where t1.grain_ind = '010';		
 
  -- 测试
 		select app_channel_id,product_key,app_ver_code,grain_ind from rptdata.fact_kesheng_sdk_new_device_hourly  limit 100;

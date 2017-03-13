@@ -122,9 +122,9 @@ select t3.rowkey
       ,t3.product_key
   from (select t1.rowkey ,t1.app_ver_code ,t1.app_pkg_name ,t1.app_channel_id
               ,t1.app_os_type ,t1.event_name ,t1.product_key
-              ,split(p1.param_key_val, '"\\s*:\\s*"') param_key_val
+              ,split(p1.param_key_val, '"\\s*:\\s*"') param_key_val		-- 正则表达式并不能包含全部的情况
           from stg_kesheng_sec_event_param_json t1
-               lateral view posexplode(split(regexp_replace(j2.eventParams_json, '\\{|\\}', ''), '"\\s*,\\s*"')) p1 
+               lateral view posexplode(split(regexp_replace(j2.eventParams_json, '\\{|\\}', ''), '"\\s*,\\s*"')) p1 	-- 正则表达式并不能包含全部的情况
                          as param_pos, param_key_val
         ) t3
  where nvl(translate(t3.param_key_val[0], '"', ''), '') <> ''
