@@ -1,4 +1,6 @@
 
+/*
+
 drop table if exists app.cpa_sec_event_params_last7_daily;
 
 create table app.cpa_sec_event_params_last7_daily(
@@ -14,7 +16,9 @@ val_pct        decimal(8,4)
 ) 
 partitioned by (src_file_day string);
 
--- =======================================================================
+*/
+
+
 with stg_cpa_sec_event_params_last7_daily as 
 (
 select a1.event_name

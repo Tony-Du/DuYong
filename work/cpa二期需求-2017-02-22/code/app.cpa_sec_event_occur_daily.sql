@@ -1,3 +1,4 @@
+/*
 
 drop table if exists app.cpa_sec_event_occur_daily;
 
@@ -12,7 +13,8 @@ sum_du           decimal(20,2),
 avg_du           decimal(20,2)
 ) partitioned by (src_file_day string);
 
--- ===================================================================
+*/
+
 insert overwrite table app.cpa_sec_event_occur_daily partition (src_file_day = '${SRC_FILE_DAY}')
 select t1.product_key
 	  ,if(t1.product_key=-1, '-1', nvl(b1.product_name,'')) product_name
@@ -39,32 +41,5 @@ select t1.product_key
  left join mscdata.dim_kesheng_sdk_app_pkg b1 on t1.product_key = b1.product_key
 where b1.product_key is not null or t1.product_key = -1;  	   
 
--- == 数据源 =====================================
-create table rptdata.fact_kesheng_sec_event_occur_hourly
-(
-   app_channel_id       string,
-   product_key          smallint,
-   app_ver_code         string,
-   event_name           string,
-   event_cnt            bigint,
-   sum_du               decimal(20,2),
-   avg_du               decimal(20,2),
-   grain_ind            string comment '000-将所渠道、产品、版本汇总成一条记录;
-										010-产品;
-										011-产品+版本;
-										100-渠道;
-										110-渠道+产品;
-										111-渠道+产品+版本;' 
-   src_file_day         string,
-   src_file_hour        string
-);
 
-hive> desc mscdata.dim_kesheng_sdk_app_pkg;
-OK
-app_pkg_name        	string              	                    
-app_os_type         	string              	                    
-product_ver_name    	string              	                    
-product_key         	int                 	                    
-product_name        	string              	                    
-create_day          	string
 

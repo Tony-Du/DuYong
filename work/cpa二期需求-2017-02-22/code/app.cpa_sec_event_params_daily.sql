@@ -1,3 +1,4 @@
+/*
 
 drop table if exists app.cpa_sec_event_params_daily;
 
@@ -14,7 +15,9 @@ val_pct			decmal(8,4)   -- 占比
 )
 partitioned by (src_file_day string);
 
--- =======================================================================
+*/
+
+
 with stg_cpa_sec_event_params_daily as 
 (
 select a1.event_name
@@ -77,7 +80,9 @@ select t1.product_key
  left join mscdata.dim_kesheng_sdk_app_pkg b1 on t1.product_key = b1.product_key 
 where b1.product_key is not null or t1.product_key = -1; 
 
------------------------------------------------------------------------------------------------
+
+/*
+
 with stg_cpa_sec_event_params_daily as
 (
 select a1.event_name
@@ -134,47 +139,7 @@ where b1.product_key is not null or t1.product_key = -1;
 -- FAILED: SemanticException Failed to breakup Windowing invocations into Groups. At least 1 group must only depend on input columns. Also check for circular dependencies.
 -- Underlying error: org.apache.hadoop.hive.ql.parse.SemanticException: Line 39:7 Invalid column reference 'val_cnt'
 
+*/
 
--- 数据源
-create table rptdata.fact_kesheng_sec_event_params_hourly
-(
-   app_channel_id       string,
-   product_key          smallint,
-   app_ver_code         string,
-   event_name           string,
-   param_pos            int,
-   param_name           string,
-   param_val            string,
-   val_cnt              bigint,
-   grain_ind            string comment '000-将所渠道、产品、版本汇总成一条记录;
-										010-产品;
-										011-产品+版本;
-										100-渠道;
-										110-渠道+产品;
-										111-渠道+产品+版本;',
-   src_file_day         string,
-   src_file_hour        string
-);
-
-insert overwrite table rptdata.fact_kesheng_sec_event_params_hourly 
-       partition(src_file_day='${SRC_FILE_DAY}', src_file_hour='${SRC_FILE_HOUR}')
-select t1.app_channel_id
-      ,t1.product_key
-      ,t1.app_ver_code
-      ,t1.event_name
-      ,min(t1.param_pos) param_pos
-      ,t1.param_name
-      ,t1.param_val
-      ,count(1) val_cnt		-- 注意！！！
-      ,rpad(reverse(bin(cast(grouping__id as int))),3,'0') grain_ind
- from intdata.kesheng_sec_event_params t1
-where t1.src_file_day = '${SRC_FILE_DAY}' 
-  and t1.src_file_hour = '${SRC_FILE_HOUR}'
-group by t1.app_channel_id, t1.product_key, t1.app_ver_code		--注意这里group by后面的字段
-        ,t1.event_name, t1.param_name, t1.param_val		-- 针对每一个事件，每一个参数，每一个参数值出现的次数(val_cnt)是多少
-grouping set ((), app_channel_id, product_key,
-              (app_channel_id, product_key),
-              (product_key, app_ver_code),
-              (app_channel_id, product_key, app_ver_code));
 			  
 
