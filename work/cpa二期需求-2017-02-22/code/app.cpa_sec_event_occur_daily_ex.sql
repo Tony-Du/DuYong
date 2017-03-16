@@ -18,6 +18,9 @@ create 'cpa_sec_event_occur_daily','idx'
 -----------*/
 
 -- ========================================================================== --
+set mapreduce.job.name=app.cpa_sec_event_occur_daily_ex_${SRC_FILE_DAY};
+set hive.merge.mapredfiles=true;
+
 
 insert into app.cpa_sec_event_occur_daily_ex
 select concat_ws(string(unhex('1F')), t1.src_file_day, t1.product_name

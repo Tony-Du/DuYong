@@ -18,6 +18,8 @@ partitioned by (src_file_day string);
 
 */
 
+set mapreduce.job.name=app.cpa_sec_event_params_last30_daily_${SRC_FILE_DAY};
+set hive.merge.mapredfiles=true;
 
 with stg_cpa_sec_event_params_last30_daily as 
 (
@@ -72,9 +74,9 @@ select t1.product_key
 					on a.event_name = b.event_name and a.param_name = b.param_name and a.param_val = b.param_val
 				 where a.src_file_day <= '${SRC_FILE_DAY}' 
 				   and a.src_file_day > from_unixtime(unix_timestamp('${SRC_FILE_DAY}','yyyyMMdd')-60*60*24*30,'yyyyMMdd')
-				 group by if(substr(a.grain_ind,1,1)='0', '-1', a.app_channel_id) as app_channel_id 
-						 ,if(substr(a.grain_ind,2,1)='0', -1, a.product_key) as product_key 
-						 ,if(substr(a.grain_ind,3,1)='0', '-1', a.app_ver_code) as app_ver_code 
+				 group by if(substr(a.grain_ind,1,1)='0', '-1', a.app_channel_id)
+						 ,if(substr(a.grain_ind,2,1)='0', -1, a.product_key)
+						 ,if(substr(a.grain_ind,3,1)='0', '-1', a.app_ver_code)
 						 ,a.event_name
 						 ,a.param_name
 						 ,b.param_val	   	   	   

@@ -9,6 +9,6 @@ event_name      string,
 param_name      string,
 param_val       string,
 val_cnt         bigint,
-val_pct			decmal(8,4)
+val_pct         decimal(8,4)
 )
 partitioned by (src_file_day string);

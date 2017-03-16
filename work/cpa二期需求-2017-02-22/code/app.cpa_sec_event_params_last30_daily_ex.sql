@@ -20,6 +20,9 @@ create 'cpa_sec_event_params_last30_daily','param_info'
 
 -- =================================================================== --
 
+set mapreduce.job.name=app.cpa_sec_event_params_last30_daily_ex_${SRC_FILE_DAY};
+set hive.merge.mapredfiles=true;
+
 insert into app.cpa_sec_event_params_last30_daily_ex
 select t1.rowkey
       ,map('pset',collect_set(param_info)) as param_info

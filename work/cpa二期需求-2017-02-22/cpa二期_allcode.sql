@@ -8,6 +8,9 @@ create external table ods.kesheng_sec_json_ex (
 partitioned by (src_file_day string, src_file_hour string)
 location '/user/hadoop/ods/migu/kesheng/kesheng_sec';
 
+alter table ods.kesheng_sec_json_ex add if not exists partition(src_file_day='20170315', src_file_hour='13')
+location '20170315/13'   -- 注意
+
 -- === odsdata.kesheng_sec_event_json ===================================================================================
 
 set mapreduce.job.name=odsdata.kesheng_sec_event_json_${SRC_FILE_DAY}_${SRC_FILE_HOUR};
@@ -131,7 +134,42 @@ select t3.rowkey
    and nvl(translate(t3.param_key_val[1], '"', ''), '') <> '';
 
 -- \s是指空白，包括空格、换行、tab缩进等所有的空白
-   
+
+-- 改进版
+with stg_kesheng_sec_event_param_json as
+(select a.rowkey
+       ,a.app_ver_code
+       ,a.app_pkg_name
+       ,a.app_channel_id
+       ,a.app_os_type
+       ,a.event_name
+       ,nvl(d1.product_key, -998) product_key
+       ,a.eventParams_json
+  from ods.kesheng_sec_event_param_json_v a
+  left join mscdata.dim_kesheng_sdk_app_pkg d1
+    on (a.app_pkg_name = d1.app_pkg_name and a.app_os_type = d1.app_os_type)
+ where a.src_file_day = '${SRC_FILE_DAY}' 
+   and a.src_file_hour = '${SRC_FILE_HOUR}'
+   and nvl(a.event_name, '') <> ''
+)
+insert overwrite table intdata.kesheng_sec_event_params partition(src_file_day='${SRC_FILE_DAY}', src_file_hour='${SRC_FILE_HOUR}')
+select t3.rowkey
+,t3.app_ver_code
+,t3.app_pkg_name
+,t3.app_channel_id
+,t3.app_os_type
+,t3.event_name
+,t3.param_pos
+,t3.param_key_val[0] param_name
+,t3.param_key_val[1] param_val
+,t3.product_key
+from (select t1.rowkey ,t1.app_ver_code ,t1.app_pkg_name ,t1.app_channel_id
+,t1.app_os_type ,t1.event_name ,t1.product_key, p1.param_pos
+,split(p1.param_key_val, '\\s*:\\s*') param_key_val
+from stg_kesheng_sec_event_param_json t1
+lateral view posexplode(split(regexp_replace(regexp_replace(t1.eventParams_json, '\\{|\\}', ''), '"', ''), '\\s*,\\s*')) p1 
+as param_pos, param_key_val
+) t3;   
    
 -- === rptdata.fact_kesheng_sec_event_occur_hourly ===================================================================================
    
@@ -152,7 +190,7 @@ select t1.app_channel_id
   from intdata.kesheng_sec_event_occur t1
  where t1.src_file_day = '${SRC_FILE_DAY}' 
    and t1.src_file_hour = '${SRC_FILE_HOUR}'
- group by t1.app_channel_id, t1.product_key, t1.app_ver_code, t1.event_name
+ group by t1.app_channel_id, t1.product_key, t1.app_ver_code, t1.event_name		-- 需要去掉t1.
 grouping set ((), app_channel_id, product_key,
               (app_channel_id, product_key),
               (product_key, app_ver_code),
@@ -179,7 +217,7 @@ select t1.app_channel_id
  from intdata.kesheng_sec_event_params t1
 where t1.src_file_day = '${SRC_FILE_DAY}' 
   and t1.src_file_hour = '${SRC_FILE_HOUR}'
-group by t1.app_channel_id, t1.product_key, t1.app_ver_code		--注意这里group by后面的字段
+group by t1.app_channel_id, t1.product_key, t1.app_ver_code		--需要去掉t1.     （注意这里group by后面的字段）
         ,t1.event_name, t1.param_name, t1.param_val		-- 针对每一个事件，每一个参数，每一个参数值出现的次数(val_cnt)是多少？
 grouping set ((), app_channel_id, product_key,
               (app_channel_id, product_key),

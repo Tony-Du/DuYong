@@ -18,6 +18,8 @@ create 'cpa_sec_event_params_daily','param_info'
 -----------*/
 
 -- =======================================================================
+set mapreduce.job.name=app.cpa_sec_event_params_daily_ex_${SRC_FILE_DAY};
+set hive.merge.mapredfiles=true;
 
 insert into app.cpa_sec_event_params_daily_ex
 select t1.rowkey

@@ -17,6 +17,9 @@ partitioned by (src_file_day string);
 
 */
 
+set mapreduce.job.name=app.cpa_sec_event_params_daily_${SRC_FILE_DAY};
+set hive.merge.mapredfiles=true;
+
 
 with stg_cpa_sec_event_params_daily as 
 (

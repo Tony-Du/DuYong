@@ -15,6 +15,9 @@ avg_du           decimal(20,2)
 
 */
 
+set mapreduce.job.name=app.cpa_sec_event_occur_daily_${SRC_FILE_DAY};
+set hive.merge.mapredfiles=true;
+
 insert overwrite table app.cpa_sec_event_occur_daily partition (src_file_day = '${SRC_FILE_DAY}')
 select t1.product_key
 	  ,if(t1.product_key=-1, '-1', nvl(b1.product_name,'')) product_name
@@ -39,7 +42,7 @@ select t1.product_key
 				,a.event_name
       )t1
  left join mscdata.dim_kesheng_sdk_app_pkg b1 on t1.product_key = b1.product_key
-where b1.product_key is not null or t1.product_key = -1;  	   
+where b1.product_key is not null or t1.product_key = -1; 
 
 
 
