@@ -1,8 +1,8 @@
 /*
 
-drop table if exists app.cpa_sec_event_occur_daily;
+drop table if exists app.cpa_event_occur_daily;
 
-create table app.cpa_sec_event_occur_daily(
+create table app.cpa_event_occur_daily(
 product_key      string,
 product_name     string,
 app_ver_code     string,
@@ -15,10 +15,10 @@ avg_du           decimal(20,2)
 
 */
 
-set mapreduce.job.name=app.cpa_sec_event_occur_daily_${SRC_FILE_DAY};
+set mapreduce.job.name=app.cpa_event_occur_daily_${SRC_FILE_DAY};
 set hive.merge.mapredfiles=true;
 
-insert overwrite table app.cpa_sec_event_occur_daily partition (src_file_day = '${SRC_FILE_DAY}')
+insert overwrite table app.cpa_event_occur_daily partition (src_file_day = '${SRC_FILE_DAY}')
 select t1.product_key
 	  ,if(t1.product_key=-1, '-1', nvl(b1.product_name,'')) product_name
 	  ,t1.app_ver_code

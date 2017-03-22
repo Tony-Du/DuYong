@@ -197,17 +197,17 @@ select t0.app_channel_id, t0.product_key, t0.app_ver_code
       ,t3.all_product_active_device_num		-- 相同维度下的全产品活跃设备数：用于统计单个产品活跃设备数占全部产品的比例
   from stg.fact_kesheng_sdk_new_active_daily_02 t0,
        (select b1.app_channel_id, b1.product_key
-              ,b1.accu_device_num all_ver_accu_device_num
+              ,b1.accu_device_num as all_ver_accu_device_num
           from stg.fact_kesheng_sdk_new_active_daily_02 b1
          where b1.app_ver_code = '-1'
        ) t1,
        (select b2.product_key, b2.app_ver_code
-              ,b2.accu_device_num all_channel_accu_device_num
+              ,b2.accu_device_num as all_channel_accu_device_num
           from stg.fact_kesheng_sdk_new_active_daily_02 b2
-         where b2.app_channel_id = '-1'
+         where b2.app_channel_id = '-1'			-- 取这3个维度：011,010,000
        ) t2,
        (select b3.app_channel_id, b3.app_ver_code
-              ,b3.active_device_num all_product_active_device_num
+              ,b3.active_device_num as all_product_active_device_num
           from stg.fact_kesheng_sdk_new_active_daily_02 b3
          where b3.product_key = -1 and b3.app_ver_code = '-1'
        ) t3
@@ -328,7 +328,7 @@ select if(substr(t1.grain_ind,1,1) = '0', '-1', t1.app_channel_id) app_channel_i
   from rptdata.fact_kesheng_sdk_new_device_hourly t1		
  where t1.src_file_day  <= '${EXTRACT_DATE}'			-- 取近30天的新增设备
    and t1.src_file_day  >= from_unixtime(unix_timestamp('${EXTRACT_DATE}','yyyyMMdd')-60*60*24*30,'yyyyMMdd')
-   and t1.grain_ind <> '101'	-- 除了这个维度(app_channel_id, app_ver_code)之外的所有维度 
+   and t1.grain_ind <> '101'
  group by if(substr(t1.grain_ind,1,1) = '0', '-1', t1.app_channel_id)
          ,if(substr(t1.grain_ind,2,1) = '0', -1, t1.product_key)
          ,if(substr(t1.grain_ind,3,1) = '0', '-1', t1.app_ver_code) ;
@@ -359,7 +359,7 @@ select t0.app_channel_id, t0.product_key, t0.app_ver_code
 			  ,a.error_imei_num
               ,0 past7day_start_cnt 
               ,0 past7day_duration_ms
-          from stg.fact_kesheng_sdk_session_error_daily_01 a
+          from stg.fact_kesheng_sdk_session_error_daily_01 a				-- 今天
          union all
         select b.app_channel_id, b.product_key, b.app_ver_code
               ,0 start_cnt ,0 duration_ms ,0 error_cnt ,0 error_imei_num
@@ -367,7 +367,7 @@ select t0.app_channel_id, t0.product_key, t0.app_ver_code
               ,b.duration_ms as past7day_duration_ms 
           from rptdata.fact_kesheng_sdk_session_error_daily b
          where b.src_file_day < '${EXTRACT_DATE}'
-           and b.src_file_day >= from_unixtime(unix_timestamp('${EXTRACT_DATE}','yyyyMMdd')-60*60*24*7,'yyyyMMdd')
+           and b.src_file_day >= from_unixtime(unix_timestamp('${EXTRACT_DATE}','yyyyMMdd')-60*60*24*7,'yyyyMMdd')--近7天（不包括今天）
            and b.start_cnt + b.duration_ms > 0
        )  t0
 group by t0.app_channel_id, t0.product_key, t0.app_ver_code;
@@ -411,7 +411,7 @@ grouping sets((), product_key, app_channel_id
 set mapreduce.job.name=stg.fact_kesheng_sdk_session_error_daily_01_${EXTRACT_DATE}_start;
 insert overwrite table stg.fact_kesheng_sdk_session_error_daily_01
 select t1.app_channel_id, t1.product_key, t1.app_ver_code
-      ,sum(t1.start_cnt) start_cnt		-- 取得启动次数
+      ,sum(t1.start_cnt) start_cnt		-- 取得启动次数(今天)
       ,0 duration_ms
       ,0 error_cnt
       ,0 error_imei_num

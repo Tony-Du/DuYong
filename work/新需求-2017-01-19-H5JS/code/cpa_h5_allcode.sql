@@ -7,6 +7,8 @@ PARTITIONED BY (
  
 LOCATION
  'hdfs://ns1/user/hadoop/ods/migu/kesheng/kesheng_h5'
+ 
+alter table ods.kesheng_h5_json_ex add if not exists partition(src_file_day='20170320', src_file_hour='13');
 
  --  /user/hadoop/ods/migu/kesheng/kesheng_h5/20170216/11/
  
@@ -101,7 +103,7 @@ select a.url,
           from ods.kesheng_h5_json_ex_v b
        lateral view json_tuple(b.param_json,'IP','cookieId','title','domain','referrer','height','lang','width') c 
             as ip_addr,cookie_id,title,ip_domain,referrer,height,lang,width
-         where b.data_src_type='common' and b.src_file_day='${SRC_FILE_DAY}' and b.src_file_hour='${SRC_FILE_HOUR}' 
+         where b.data_src_type = 'common' and b.src_file_day = '${SRC_FILE_DAY}' and b.src_file_hour = '${SRC_FILE_HOUR}' 
 	  )a;
 
 -- == intdata.kesheng_h5_page_visit_event =======================================
