@@ -46,7 +46,8 @@ event_name     string,
 param_name     string,
 param_val      string,
 val_cnt        bigint,
-val_pct        decimal(8,4)
+val_pct        decimal(8,4),
+stat_day string
 )
 partitioned by (src_file_day string);
 
@@ -67,10 +68,8 @@ select a1.event_name
     	      ,a.param_val
     	      ,sum(a.val_cnt)
     	      ,row_number()over(partition by a.event_name, a.param_name, a.param_val order by sum(a.val_cnt) desc) param_val_rank
-    	  from rptdata.fact_kesheng_event_params_hourly a
-    	 where a.src_file_day <= '${SRC_FILE_DAY}'
-    	   and a.src_file_day > from_unixtime(unix_timestamp('${SRC_FILE_DAY}','yyyyMMdd')-60*60*24*7,'yyyyMMdd')
-    	   and a.grain_ind = '000111'
+    	  from stg.cpa_event_params_daily_01 a
+		 where a.app_channel_id = '-1' and a.product_key= -1 and a.app_ver_code = '-1'
     	 group by a.event_name
     	         ,a.param_name
     	         ,a.param_val
@@ -87,38 +86,39 @@ select t1.product_key
 	  ,t1.param_val
 	  ,t1.val_cnt
 	  ,if (t1.all_val_cnt = 0, 0 ,round(t1.val_cnt/t1.all_val_cnt, 4)) as val_pct
+	  ,'${SRC_FILE_DAY}' as stat_day
   from (
-	    select t0.app_channel_id
-	          ,t0.product_key
-	          ,t0.app_ver_code
-	          ,t0.event_name
-	          ,t0.param_name
-	          ,t0.param_val
-	          ,t0.val_cnt
-	          ,sum(t0.val_cnt) over(partition by t0.app_channel_id, t0.product_key, t0.app_ver_code, t0.event_name, t0.param_name) as all_val_cnt
-	      from (
-	            select a.app_channel_id
-					  ,a.product_key
-					  ,a.app_ver_code
-					  ,a.event_name
-					  ,a.param_name
-					  ,nvl(b.param_val, '-998') as param_val
-					  ,sum(a.val_cnt) as val_cnt
-	              from stg.cpa_event_params_last7_daily_01 a
-	              left join stg_cpa_event_params_last7_daily b
-	                on a.event_name = b.event_name and a.param_name = b.param_name and a.param_val = b.param_val
-	             group by a.app_channel_id
-					     ,a.product_key
-					     ,a.app_ver_code
-					     ,a.event_name
-					     ,a.param_name
-					     ,nvl(b.param_val, '-998')
-	           )t0
+		select a.app_channel_id
+			  ,a.product_key
+			  ,a.app_ver_code
+			  ,a.event_name
+			  ,a.param_name
+			  ,nvl(b.param_val, '-998') as param_val
+			  ,sum(a.val_cnt) as val_cnt 
+			  ,sum(sum(a.val_cnt)) over(partition by a.app_channel_id, a.product_key, a.app_ver_code, a.event_name, a.param_name) as all_val_cnt
+		  from stg.cpa_event_params_last7_daily_01 a
+		  left join stg_cpa_event_params_last7_daily b
+			on a.event_name = b.event_name and a.param_name = b.param_name and a.param_val = b.param_val
+		 group by a.app_channel_id
+				 ,a.product_key
+				 ,a.app_ver_code
+				 ,a.event_name
+				 ,a.param_name
+				 ,nvl(b.param_val, '-998')
        ) t1
   left join mscdata.dim_kesheng_sdk_product b1 on t1.product_key = b1.product_key
  where b1.product_key is not null or t1.product_key = -1;
 
 
 
-
+sqoop export --connect jdbc:oracle:thin:@172.16.14.201:1521:cdmpdb1 \
+--username cdmp_dmt \
+--password \!2012cdmp_dmt\! \
+--table cpa_event_params_last7_daily \
+--export-dir /user/hive/warehouse/app.db/cpa_event_params_last7_daily/src_file_day=20170322 \
+--columns product_key,product_name,app_ver_code,app_channel_id,event_name,param_name,param_val,val_cnt,val_pct,src_file_day \
+--input-fields-terminated-by '\001' \
+--input-lines-terminated-by '\n' \
+--input-null-string '\\N' \
+--input-null-non-string '\\N'
 

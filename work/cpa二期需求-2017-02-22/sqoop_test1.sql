@@ -52,7 +52,6 @@ alter table t_range rename partition SYS_P23 to p_2014_04_01;
 
 
 -- 再帖一个：按天间隔分区、按小时子分区的例子给你：
-
 -- Step 1: 创建表：(按小时子分区)
 CREATE TABLE BIEE.DW_ADS_ADI_VADS_HOUR2
 (
