@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+						"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.migu.cpa.mapper.EventOccurMapper">
+
+	<resultMap id="BaseResultMap" type="com.migu.cpa.domain.EventOccurInfo">
+		<result column="src_file_day" property="date" />
+		<result column="event_cnt" property="count"></result>
+		<result column="sum_du" property="sumDu"></result>
+		<result column="avg_du" property="avgDu"></result>
+		<!--<result column="product_key" property="product_key"></result> <result 
+			column="product_name" property="product_name"></result> <result column="app_ver_code" 
+			property="app_ver_code"></result> <result column="app_channel_id" property="app_channel_id"></result> 
+			<result column="event_name" property="event_name"></result> -->
+
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		event_cnt,sum_du,avg_du,src_file_day
+	</sql>
+
+	<select id="findEventInfoDay" parameterType="java.lang.String" resultMap="BaseResultMap">
+		select  <include refid="Base_Column_List" /> from cpa_event_occur_daily
+		where src_file_day=#{src_file_day} and
+		     <!--   product_name = #{product} and-->
+		     app_ver_code = #{version} and
+		     app_channel_id = #{channel} and
+		     event_name = #{eventName}
+	</select>
+
+	<select id="findEventInfoPast" parameterType="Object" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from cpa_event_occur_daily
+		<where>
+			    src_file_day <![CDATA[ >= ]]> #{startDate}
+			and src_file_day <![CDATA[ <= ]]> #{endDate}
+			and product_name = #{product_name} 
+			and app_channel_id = #{app_channel_id} 
+			and app_ver_code = #{app_ver_code} 
+			and event_name = #{event_name}
+		</where>
+	</select>
+
+</mapper>

@@ -9,9 +9,8 @@ app_ver_code     string,
 app_channel_id   string,
 event_name       string,
 event_cnt        bigint,
-sum_du           decimal(20,2),
-avg_du           decimal(20,2),
-stat_day string
+sum_du           decimal(28,2),
+avg_du           decimal(28,2)
 ) partitioned by (src_file_day string);
 
 测试数据：20170315,,2010322
@@ -29,7 +28,6 @@ select t1.product_key
 	  ,t1.event_cnt
 	  ,t1.sum_du 
 	  ,if(t1.event_cnt = 0, 0, round(t1.sum_du/t1.event_cnt,2)) as avg_du
-	  ,'${SRC_FILE_DAY}' as stat_day
   from( 
 		select if(substr(a.grain_ind,1,1)= '0', '-1', a.app_channel_id) as app_channel_id
 			  ,if(substr(a.grain_ind,2,1)= '0', -1, a.product_key) as product_key

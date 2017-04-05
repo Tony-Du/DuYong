@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+						"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.migu.cpa.mapper.EventParamsMapper">
+
+<!-- 返回结果集map -->
+	<resultMap id="BaseResultMap" type="com.migu.cpa.domain.EventParamsProperty">
+		<result column="param_name" property="param_name" />
+		<result column="param_val" property="name"></result>
+		<result column="val_cnt" property="value"></result>
+		<result column="val_pct" property="percent"></result>
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		param_name,param_val,val_cnt,val_pct
+	</sql>
+	
+	<!-- 查询当前时间的事件参数信息 -->
+	<select id="findEventParamsDay" parameterType="Object" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from cpa_event_params_daily
+		where src_file_day = #{0} and
+		      product_key = #{1} and
+		      app_ver_code = #{2} and
+		      app_channel_id = #{3} and
+		      event_name = #{4}
+	</select>
+	
+	<!-- 查询过去7天的事件参数信息 -->
+	<select id="findEventParamsLast7Day" parameterType="Object" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from cpa_event_params_last7_daily
+		where src_file_day = #{0} and
+		      product_key = #{1} and
+		      app_ver_code = #{2} and
+		      app_channel_id = #{3} and
+		      event_name = #{4}
+	</select>
+	
+	<!-- 查询过去30天的事件参数信息 -->
+	<select id="findEventParamsLast30Day" parameterType="Object" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from cpa_event_params_last30_daily
+		where src_file_day = #{0} and
+		      product_key = #{1} and
+		      app_ver_code = #{2} and
+		      app_channel_id = #{3} and
+		      event_name = #{4}
+	</select>
+</mapper>

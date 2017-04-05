@@ -48,8 +48,7 @@ event_name     string,
 param_name     string,
 param_val      string,
 val_cnt        bigint,
-val_pct        decimal(8,4),
-stat_day string
+val_pct        decimal(8,4)
 ) 
 partitioned by (src_file_day string);
 
@@ -68,13 +67,9 @@ select a1.event_name
 		select a.event_name
 			  ,a.param_name
 			  ,a.param_val
-			  ,sum(a.val_cnt)
-			  ,row_number()over(partition by a.event_name, a.param_name, a.param_val order by sum(a.val_cnt) desc) param_val_rank
-		  from stg.cpa_event_params_daily_01 a
-		 where a.app_channel_id = '-1' and a.product_key= -1 and a.app_ver_code = '-1'
-	     group by a.event_name
-			     ,a.param_name
-			     ,a.param_val																				
+			  ,row_number()over(partition by a.event_name, a.param_name, a.param_val order by a.val_cnt desc) param_val_rank
+		  from stg.cpa_event_params_last30_daily_01 a
+		 where a.app_channel_id = '-1' and a.product_key= -1 and a.app_ver_code = '-1'																			
 		) a1
  where a1.param_val_rank <= 1000
 )
@@ -88,7 +83,6 @@ select t1.product_key
 	  ,t1.param_val
 	  ,t1.val_cnt
 	  ,if (t1.all_val_cnt = 0, 0 ,round(t1.val_cnt/t1.all_val_cnt, 4)) as val_pct 
-	  ,'${SRC_FILE_DAY}' as stat_day
   from (
 		select a.app_channel_id
 			  ,a.product_key

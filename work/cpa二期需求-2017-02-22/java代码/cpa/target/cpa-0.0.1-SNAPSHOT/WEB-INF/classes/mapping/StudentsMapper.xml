@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+						"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.migu.cpa.mapper.StudentsMapper" >
+<!-- 返回结果集map     -->
+<resultMap  id = "BaseResultMap"  type = "com.migu.cpa.domain.Students">
+       	    <id column="id" property="id" />
+	    	<result column="name" property="name_s"></result>
+	    <!--	<result column="age" property="age"></result>
+	    	 <result column="grace" property="grace"></result>  -->
+</resultMap>
+
+<sql id="Base_Column_List" >
+	id,name,age,grace
+</sql>
+
+<select id="findById"  parameterType="Object" resultMap="BaseResultMap">
+	select  id,name  from students where id = #{id}
+</select>
+
+</mapper> 

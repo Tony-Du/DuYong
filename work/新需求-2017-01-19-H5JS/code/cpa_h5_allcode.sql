@@ -371,9 +371,9 @@ where e.chn_id is not null or t1.channel_id='-1';
 
 -- == app.cpa_h5_event_daily =======================================			
 			
-set mapreduce.job.name=app.cpa_h5_event_daily_${SRC_FILE_DAY}; --这个你暂时不管，hive的配置
+set mapreduce.job.name=app.cpa_h5_event_daily_${SRC_FILE_DAY}; 
 
-insert overwrite table app.cpa_h5_event_daily partition (src_file_day='${SRC_FILE_DAY}')--插入数据到带分区的表中
+insert overwrite table app.cpa_h5_event_daily partition (src_file_day='${SRC_FILE_DAY}')
 select '${SRC_FILE_DAY}' as stat_time
 	,if(t1.product_key=-1, '-1', d.product_name) as product_name 
 	,t1.product_key
@@ -386,7 +386,7 @@ select '${SRC_FILE_DAY}' as stat_time
 	,case when t1.uv_num = 0 then 0 else round(t1.visit_duration_ms/(t1.uv_num*1000)) end as avg_visit_duration_sec 
 	,t1.download_click_cnt
 from(
-	select if(substr(a1.grain_ind,1,1) = '0', -1, a1.product_key) as product_key --第二层子查询  差不多建一张表的流程就这样
+	select if(substr(a1.grain_ind,1,1) = '0', -1, a1.product_key) as product_key 
 		  ,if(substr(a1.grain_ind,2,1) = '0', '-1', a1.channel_id) as channel_id
 		  ,if(substr(a1.grain_ind,3,1) = '0', '-1', a1.page_id) as page_id
 		  ,if(substr(a1.grain_ind,4,1) = '0', '-1', a1.os) as os
