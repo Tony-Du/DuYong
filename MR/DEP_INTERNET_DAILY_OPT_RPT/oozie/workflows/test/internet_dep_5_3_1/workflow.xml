@@ -1,0 +1,494 @@
+<workflow-app xmlns='uri:oozie:workflow:0.1'
+	name='td_internet_dep_recommend_usr_term_visit_daily'>
+	
+	<start to="fork_user_tourist_visit_page" />
+	
+	
+	<fork name="fork_user_tourist_visit_page">
+		<path start="user_visit_detail" />
+		<path start="tourist_visit_detail" />
+		<path start="term_prod_id" />
+	</fork>
+	
+	
+	<!-- user_visit_detail
+	${outputTmp}/user_visit_detail
+	STATIS_DAY, PAGE_ID, TERM_PROD_ID,
+	USR_UV, USR_PV
+	-->
+	<action name="user_visit_detail">
+		<java>
+			<job-tracker>${jobTracker}</job-tracker>
+			<name-node>${nameNode}</name-node>
+			<prepare>
+				<delete path="${outputTmp}/user_visit_detail" />
+			</prepare>
+			<configuration>
+				<property>
+					<name>mapred.job.queue.name</name>
+					<value>${queue}</value>
+				</property>
+				<property>
+					<name>mapred.child.java.opts</name>
+					<value>-Xmx1024m</value>
+				</property>
+				<property>
+					<name>mapred.reduce.tasks</name>
+					<value>1</value>
+				</property>
+				<property>
+					<name>NameNode</name>
+					<value>${nameNode}</value>
+				</property>
+			</configuration>
+			<main-class>com.mganaly.utils.MainRunner</main-class>
+			<arg>td_pub_visit_log_d_tool</arg>
+			
+			<arg>inDate= ${startDate}</arg>
+			<arg>outpath=${outputTmp}/user_visit_detail</arg>
+			
+			<arg>inpath=${cdmpPath}/td_pub_visit_log_d</arg>
+			
+			<arg>mapKeys= STATIS_DAY, PAGE_ID, TERM_PROD_ID</arg>
+			<arg>mapVals= SERV_NUMBER, NUM:1</arg>
+			<arg>redVals= CNT:SERV_NUMBER, SUM:1</arg>
+			
+			<capture-output />
+		</java>
+		<ok to="user_visit_page" />
+		<error to="fail" />
+	</action>
+
+
+	<!-- Start User Page visit info OUTPUT_COLS : 
+	PAGE_ID, PAGE_NAME, 
+	STATIS_DAY, TERM_PROD_ID, USR_UV, USR_PV
+	-->
+	<action name="user_visit_page">
+		<java>
+			<job-tracker>${jobTracker}</job-tracker>
+			<name-node>${nameNode}</name-node>
+			<prepare>
+				<delete path="${outputTmp}/user_visit_page" />
+			</prepare>
+			<configuration>
+				<property>
+					<name>mapred.job.queue.name</name>
+					<value>${queue}</value>
+				</property>
+				<property>
+					<name>mapred.child.java.opts</name>
+					<value>-Xmx1024m</value>
+				</property>
+				<property>
+					<name>mapred.reduce.tasks</name>
+					<value>1</value>
+				</property>
+				<property>
+					<name>NameNode</name>
+					<value>${nameNode}</value>
+				</property>
+			</configuration>
+			<main-class>com.mganaly.utils.MainRunner</main-class>
+			<arg>map_join_tool</arg>
+			
+			<arg>outpath=${outputTmp}/user_visit_page</arg>
+			
+			<arg>inpath=${td_dep_internet_page_info}</arg>
+			<arg>inpathR=${outputTmp}/user_visit_detail</arg>
+
+			<arg>mapCols= PAGE_ID, PAGE_NAME</arg>
+			<arg>mapKeys= PAGE_ID</arg>
+			<arg>mapVals= PAGE_NAME</arg>
+
+			<arg>mapRCols= STATIS_DAY, PAGE_ID, TERM_PROD_ID, USR_UV, USR_PV</arg>
+			<arg>mapRKeys= PAGE_ID</arg>
+			<arg>mapRVals= STATIS_DAY, TERM_PROD_ID, USR_UV, USR_PV</arg>
+			<capture-output />
+		</java>
+		<ok to="join_user_tourist_visit_page" />
+		<error to="fail" />
+	</action>
+	
+	
+	<!-- tourist_visit_detail
+	${outputTmp}/tourist_visit_detail
+	STATIS_DAY, PAGE_ID, TERM_PROD_ID,
+	TOURIST_UV, TOURIST_PV
+	-->
+	<action name="tourist_visit_detail">
+		<java>
+			<job-tracker>${jobTracker}</job-tracker>
+			<name-node>${nameNode}</name-node>
+			<prepare>
+				<delete path="${outputTmp}/tourist_visit_detail" />
+			</prepare>
+			<configuration>
+				<property>
+					<name>mapred.job.queue.name</name>
+					<value>${queue}</value>
+				</property>
+				<property>
+					<name>mapred.child.java.opts</name>
+					<value>-Xmx1024m</value>
+				</property>
+				<property>
+					<name>mapred.reduce.tasks</name>
+					<value>1</value>
+				</property>
+				<property>
+					<name>NameNode</name>
+					<value>${nameNode}</value>
+				</property>
+			</configuration>
+			<main-class>com.mganaly.utils.MainRunner</main-class>
+			<arg>td_pub_visit_log_wd_tourist_d_tool</arg>
+			<arg>inDate= ${startDate}</arg>
+			<arg>outpath=${outputTmp}/tourist_visit_detail</arg>
+			
+			<arg>inpath=${cdmpPath}/td_pub_tourist_visit_log_d</arg>
+			<arg>mapKeys= STATIS_DAY, PAGE_ID, TERM_PROD_ID</arg>
+			<arg>mapVals= SERV_NUMBER, NUM:1</arg>
+			<arg>redVals= CNT:SERV_NUMBER, SUM:1</arg>
+			<capture-output />
+		</java>
+		<ok to="tourist_visit_page" />
+		<error to="fail" />
+	</action>
+
+	<!-- tourist_visit_page 
+	${outputTmp}/tourist_visit_page
+	PAGE_ID, PAGE_NAME, 
+	STATIS_DAY, TERM_PROD_ID, TOURIST_UV, TOURIST_PV
+	-->
+	<action name="tourist_visit_page">
+		<java>
+			<job-tracker>${jobTracker}</job-tracker>
+			<name-node>${nameNode}</name-node>
+			<prepare>
+				<delete path="${outputTmp}/tourist_visit_page" />
+			</prepare>
+			<configuration>
+				<property>
+					<name>mapred.job.queue.name</name>
+					<value>${queue}</value>
+				</property>
+				<property>
+					<name>mapred.child.java.opts</name>
+					<value>-Xmx1024m</value>
+				</property>
+				<property>
+					<name>mapred.reduce.tasks</name>
+					<value>1</value>
+				</property>
+				<property>
+					<name>NameNode</name>
+					<value>${nameNode}</value>
+				</property>
+			</configuration>
+			<main-class>com.mganaly.utils.MainRunner</main-class>
+			<arg>map_join_tool</arg>
+			<arg>outpath=${outputTmp}/tourist_visit_page</arg>
+			
+			<arg>inpath=${td_dep_internet_page_info}</arg>
+			<arg>inpathR=${outputTmp}/tourist_visit_detail</arg>
+
+			<arg>mapCols= PAGE_ID, PAGE_NAME</arg>
+			<arg>mapKeys= PAGE_ID</arg>
+			<arg>mapVals= PAGE_NAME</arg>
+
+			<arg>mapRCols= STATIS_DAY, PAGE_ID, TERM_PROD_ID, TOURIST_UV, TOURIST_PV</arg>
+			<arg>mapRKeys= PAGE_ID</arg>
+			<arg>mapRVals= STATIS_DAY, TERM_PROD_ID, TOURIST_UV, TOURIST_PV</arg>
+			<capture-output />
+		</java>
+		<ok to="join_user_tourist_visit_page" />
+		<error to="fail" />
+	</action>
+
+	<!-- End Tourist Page Visit info -->
+
+
+	<!-- term_prod_id
+	TERM_PROD_ID, TERM_PROD_NAME
+	-->
+	<action name="term_prod_id">
+		<java>
+			<job-tracker>${jobTracker}</job-tracker>
+			<name-node>${nameNode}</name-node>
+			<prepare>
+				<delete path="${outputTmp}/term_prod_id" />
+			</prepare>
+			<configuration>
+				<property>
+					<name>mapred.job.queue.name</name>
+					<value>${queue}</value>
+				</property>
+				<property>
+					<name>mapred.child.java.opts</name>
+					<value>-Xmx1024m</value>
+				</property>
+				<property>
+					<name>mapred.reduce.tasks</name>
+					<value>1</value>
+				</property>
+				<property>
+					<name>NameNode</name>
+					<value>${nameNode}</value>
+				</property>
+			</configuration>
+			<main-class>com.mganaly.utils.MainRunner</main-class>
+			<arg>tdim_prod_id_tool</arg>
+			<arg>redNum=1</arg>
+			<arg>outpath=${outputTmp}/term_prod_id</arg>
+			
+			<arg>inpath=${cdmpPath}/tdim_prod_id</arg>
+			
+			<arg>mapKeys= TERM_PROD_ID</arg>
+			<arg>mapVals=APP:MG_ShiPin</arg>
+			<arg>redVals=MG_ShiPin</arg>
+			<capture-output />
+		</java>
+		<ok to="join_user_tourist_visit_page" />
+		<error to="fail" />
+	</action>
+
+	<join name="join_user_tourist_visit_page" to="total_page_visit" />
+
+	<!-- total_page_visit
+	${outputTmp}/total_page_visit
+	PAGE_ID, PAGE_NAME, STATIS_DAY, TERM_PROD_ID,
+	USR_UV, USR_PV, 
+	TOURIST_UV, TOURIST_PV
+	-->
+	<action name="total_page_visit">
+		<java>
+			<job-tracker>${jobTracker}</job-tracker>
+			<name-node>${nameNode}</name-node>
+			<prepare>
+				<delete path="${outputTmp}/total_page_visit" />
+			</prepare>
+			<configuration>
+				<property>
+					<name>mapred.job.queue.name</name>
+					<value>${queue}</value>
+				</property>
+				<property>
+					<name>mapred.child.java.opts</name>
+					<value>-Xmx1024m</value>
+				</property>
+				<property>
+					<name>mapred.reduce.tasks</name>
+					<value>1</value>
+				</property>
+				<property>
+					<name>NameNode</name>
+					<value>${nameNode}</value>
+				</property>
+			</configuration>
+			<main-class>com.mganaly.utils.MainRunner</main-class>
+
+			<arg>outer_join_tool</arg>
+			<arg>outpath=${outputTmp}/total_page_visit</arg>
+			
+			<arg>inpath=${outputTmp}/user_visit_page</arg>
+			<arg>inpathR=${outputTmp}/tourist_visit_page</arg>
+
+			<arg>mapCols= PAGE_ID, PAGE_NAME, 
+							STATIS_DAY, TERM_PROD_ID, USR_UV, USR_PV
+			</arg>
+			<arg>mapKeys= PAGE_ID, PAGE_NAME, STATIS_DAY, TERM_PROD_ID</arg>
+			<arg>mapVals= USR_UV, USR_PV</arg>
+			<arg>redVals= SUM:USR_UV, SUM:USR_PV</arg>
+
+			<arg>mapRCols= PAGE_ID, PAGE_NAME, 
+							STATIS_DAY, TERM_PROD_ID, TOURIST_UV, TOURIST_PV
+			</arg>
+			<arg>mapRKeys= PAGE_ID, PAGE_NAME, STATIS_DAY, TERM_PROD_ID</arg>
+			<arg>mapRVals= TOURIST_UV, TOURIST_PV</arg>
+			<arg>redRVals= SUM:TOURIST_UV, SUM:TOURIST_PV</arg>
+
+			<capture-output />
+		</java>
+		<ok to="total_page_visit_term" />
+		<error to="fail" />
+	</action>
+
+
+
+	<!--total_page_visit_term :
+	${outputTmp}/total_page_visit_term
+	TERM_PROD_ID, 
+	TERM_PROD_NAME, 
+	PAGE_ID, PAGE_NAME, STATIS_DAY, USER_UV, USER_PV, TOURIST_UV, TOURIST_PV 
+	-->
+	<action name="total_page_visit_term">
+		<java>
+			<job-tracker>${jobTracker}</job-tracker>
+			<name-node>${nameNode}</name-node>
+			<prepare>
+				<delete path="${outputTmp}/total_page_visit_term" />
+			</prepare>
+			<configuration>
+				<property>
+					<name>mapred.job.queue.name</name>
+					<value>${queue}</value>
+				</property>
+				<property>
+					<name>mapred.child.java.opts</name>
+					<value>-Xmx1024m</value>
+				</property>
+				<property>
+					<name>mapred.reduce.tasks</name>
+					<value>1</value>
+				</property>
+				<property>
+					<name>NameNode</name>
+					<value>${nameNode}</value>
+				</property>
+			</configuration>
+			<main-class>com.mganaly.utils.MainRunner</main-class>
+			<arg>map_join_tool</arg>
+			<arg>redNum=1</arg>
+			<arg>outpath=${outputTmp}/total_page_visit_term</arg>
+			
+			<arg>inpath=${outputTmp}/term_prod_id</arg>
+			<arg>inpathR=${outputTmp}/total_page_visit</arg>
+
+			<arg>mapCols= TERM_PROD_ID,
+				 TERM_PROD_NAME</arg>
+			<arg>mapKeys= TERM_PROD_ID</arg>
+			<arg>mapVals= TERM_PROD_NAME</arg>
+
+			<arg>mapRCols= PAGE_ID, PAGE_NAME, STATIS_DAY, TERM_PROD_ID,
+							USR_UV, USR_PV, TOURIST_UV, TOURIST_PV
+			</arg>
+			<arg>mapRKeys= TERM_PROD_ID</arg>
+			<arg>mapRVals= PAGE_ID, PAGE_NAME, STATIS_DAY,
+				 USR_UV, USR_PV, TOURIST_UV, TOURIST_PV</arg>
+
+			<capture-output />
+		</java>
+		<ok to="left_align_page_info_visit_term" />
+		<error to="fail" />
+	</action>
+
+
+
+
+	<!--left_align_page_info_visit_term
+	${outputTmp}/left_align_page_info_visit_term
+	PAGE_ID, PAGE_NAME, STATIS_DAY, TERM_PROD_NAME, 
+		 USER_UV, USER_PV, TOURIST_UV, TOURIST_PV 
+	-->
+	<action name="left_align_page_info_visit_term">
+		<java>
+			<job-tracker>${jobTracker}</job-tracker>
+			<name-node>${nameNode}</name-node>
+			<prepare>
+				<delete path="${outputTmp}/left_align_page_info_visit_term" />
+			</prepare>
+			<configuration>
+				<property>
+					<name>mapred.job.queue.name</name>
+					<value>${queue}</value>
+				</property>
+				<property>
+					<name>mapred.child.java.opts</name>
+					<value>-Xmx1024m</value>
+				</property>
+				<property>
+					<name>mapred.reduce.tasks</name>
+					<value>1</value>
+				</property>
+				<property>
+					<name>NameNode</name>
+					<value>${nameNode}</value>
+				</property>
+			</configuration>
+			<main-class>com.mganaly.utils.MainRunner</main-class>
+			<arg>left_join_tool</arg>
+			<arg>redNum=1</arg>
+			<arg>startDate=${startDate}</arg>
+			
+			<arg>outDate= ${startDate}</arg>
+			<arg>outpath=${localOutputPath}</arg>
+			
+			<arg>inpath=${td_dep_internet_page_info}</arg>
+			<arg>inpathR=${outputTmp}/total_page_visit_term</arg>
+
+			<arg>mapCols= PAGE_ID, PAGE_NAME</arg>
+			<arg>mapKeys= PAGE_ID</arg>
+			<arg>mapVals= PAGE_NAME</arg>
+
+			<arg>mapRCols=
+				 TERM_PROD_ID,
+				 TERM_PROD_NAME,
+				 PAGE_ID, PAGE_NAME, STATIS_DAY,
+				 USER_UV, USER_PV,
+				 TOURIST_UV, TOURIST_PV
+			</arg>
+			<arg>mapRKeys= PAGE_ID</arg>
+			<arg>mapRVals= STATIS_DAY NOT NULL, TERM_PROD_NAME NOT NULL,
+				 USER_UV DEF ZERO, TOURIST_UV DEF ZERO, USER_PV DEF ZERO,
+				 TOURIST_PV DEF ZERO</arg>
+
+			<capture-output />
+		</java>
+		<ok to="submitDatabase" />
+		<error to="fail" />
+	</action>
+
+
+	<!--OUTPUT_COLS : PAGE_ID, PAGE_NAME, STATIS_DAY, TERM_PROD_NAME, 
+		 USER_UV, USER_PV, TOURIST_UV, TOURIST_PV -->
+	<action name="submitDatabase">
+		<java>
+			<job-tracker>${jobTracker}</job-tracker>
+			<name-node>${nameNode}</name-node>
+			<configuration>
+				<property>
+					<name>mapred.job.queue.name</name>
+					<value>${queue}</value>
+				</property>
+				<property>
+					<name>mapred.child.java.opts</name>
+					<value>-Xmx1024m</value>
+				</property>
+				<property>
+					<name>mapred.reduce.tasks</name>
+					<value>1</value>
+				</property>
+				<property>
+					<name>NameNode</name>
+					<value>${nameNode}</value>
+				</property>
+			</configuration>
+			<main-class>com.mganaly.utils.MainRunner</main-class>
+			<arg>mysql_table_submit</arg>
+			<arg>inDate=${startDate}</arg>
+			<arg>inpath=${localOutputPath}</arg>
+			<arg>tableName=td_internet_dep_recommend_usr_visit_daily</arg>
+			<arg>tableColNum=9</arg>
+			<capture-output />
+		</java>
+		<ok to="cleanTempData" />
+		<error to="fail" />
+	</action>
+
+
+	<action name="cleanTempData">
+		<fs>
+			<delete path="${outputTmp}/genTestData/temp" />
+		</fs>
+		<ok to="end" />
+		<error to="end" />
+	</action>
+
+	<kill name="fail">
+		<message>Failed, error message[${wf:errorMessage(wf:lastErrorNode())}]
+		</message>
+	</kill>
+
+	<end name="end" />
+</workflow-app>

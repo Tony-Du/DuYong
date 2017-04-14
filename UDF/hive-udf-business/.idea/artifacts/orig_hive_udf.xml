@@ -1,0 +1,6 @@
+<component name="ArtifactManager">
+  <artifact type="jar" build-on-make="true" name="orig_hive_udf">
+    <output-path>$PROJECT_DIR$/out/artifacts/orig_hive_udf</output-path>
+    <root id="archive" name="orig_hive_udf.jar" />
+  </artifact>
+</component>

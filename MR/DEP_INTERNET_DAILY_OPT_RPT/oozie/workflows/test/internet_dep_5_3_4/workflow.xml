@@ -1,0 +1,199 @@
+<workflow-app xmlns='uri:oozie:workflow:0.1' name='internet_dep_recom_page_content_bill_daily'>
+
+	<!--<start to="subworkflow-tdim_page_pose_cont" />-->
+	<start to="subworkflow-tdim_page_pose_cont" />
+	
+	
+	<!-- tdim_program_content 
+	${outputTmp}/tdim_program_content	
+	 PROGRAM_ID, PROGRAM_NAME, CONTENT_ID
+	-->
+	
+	<!--tdim_sinc_cont_prog : 
+	${outputTmp}/tdim_sinc_cont_prog
+	CONTENT_ID, SIN_CONTENT_ID, PROGRAM_ID, PROGRAM_NAME
+	-->
+	
+	<!-- tdim_term_prod
+	${outputTmp}/tdim_term_prod
+	TERM_PROD_ID, TERM_PROD_NAME
+	-->	
+	
+	<!-- tdim_page_name_pose: 
+	${outputTmp}/tdim_page_name_pose
+	 PAGE_ID, PAGE_NAME, SHOW_OBJ_ID, SHOW_OBJ_NAME
+	-->
+	
+	<!-- tdim_term_videotype 
+	${outputTmp}/tdim_contet_sincont
+	 CONTENT_ID, SIN_CONTENT_ID
+	-->
+	
+	<action name="subworkflow-tdim_page_pose_cont">
+    <sub-workflow>
+      <app-path>${nameNode}/user/hadoop/public/migu_analyo_ly/oozie/workflows/test/internet_dep_5_3_4/tdim_page_pose_cont</app-path>
+			<propagate-configuration/>
+    </sub-workflow>
+    <ok to="subworkflow-tdim_use_visit"/>
+    <error to="fail"/>
+  </action>
+	
+	<!-- user_use: 
+	${outputTmp}/user_use
+	STATIS_DAY, CONTENT_ID, TERM_PROD_ID, SERV_NUMBER,
+	USE_DUR, USE_FLOW, USE_PV
+	-->
+	
+	<!-- tourist_use: 
+	${outputTmp}/tourist_use
+	STATIS_DAY, CONTENT_ID, TERM_PROD_ID, SERV_NUMBER, 
+	USE_DUR, USE_FLOW, USE_PV
+	-->
+	
+	<!-- user_visit: 
+	${outputTmp}/user_visit
+	STATIS_DAY, SUP_POSE_ID, PROGRAM_ID, TERM_PROD_ID, SERV_NUMBER,
+	 USR_VISIT_PV
+	-->
+	
+	<!-- tourist_visit: 
+	 STATIS_DAY, SUP_POSE_ID, PROGRAM_ID, TERM_PROD_ID, SERV_NUMBER,
+	 TOURIST_VISIT_PV
+	-->
+	<action name="subworkflow-tdim_use_visit">
+    <sub-workflow>
+      <app-path>${nameNode}/user/hadoop/public/migu_analyo_ly/oozie/workflows/test/internet_dep_5_3_4/tdim_use_visit</app-path>
+			<propagate-configuration/>
+    </sub-workflow>
+    <ok to="subworkflow-tdim_term_cont"/>
+    <error to="fail"/>
+  </action>
+  
+  
+	<!--page_pose_content_visit : 
+	TERM_PROD_NAME, POSE_ID, POSE_NAME, PAGE_ID, PAGE_NAME, STATIS_DAY, CONTENT_ID, PROGRAM_NAME,
+	VISIT_UV, VISIT_PV
+	-->
+	
+	<!--page_pose_content_visit : 
+	TERM_PROD_NAME, POSE_ID, POSE_NAME, PAGE_ID, PAGE_NAME, STATIS_DAY, CONTENT_ID, PROGRAM_NAME,
+	USE_UV, USE_PV, USE_DUR, USE_FLOW
+	-->
+	<action name="subworkflow-tdim_term_cont">
+    <sub-workflow>
+      <app-path>${nameNode}/user/hadoop/public/migu_analyo_ly/oozie/workflows/test/internet_dep_5_3_4/tdim_term_cont</app-path>
+			<propagate-configuration/>
+    </sub-workflow>
+    <ok to="page_pose_content"/>
+    <error to="fail"/>
+  </action>
+  
+	<!-- page_pose_content: 
+	${outputTmp}/page_pose_content
+	 TERM_PROD_NAME, POSE_ID, POSE_NAME, PAGE_ID, PAGE_NAME, STATIS_DAY, CONTENT_ID, PROGRAM_NAME, 
+	 VISIT_UV, VISIT_PV,
+	 USE_UV, USE_PV, USE_DUR, USE_FLOW
+	-->
+	<action name="page_pose_content">
+		<java>
+			<job-tracker>${jobTracker}</job-tracker>
+			<name-node>${nameNode}</name-node>
+			<configuration>
+				<property>
+					<name>mapred.job.queue.name</name>
+					<value>${queue}</value>
+				</property>
+				<property>
+					<name>mapred.child.java.opts</name>
+					<value>-Xmx1024m</value>
+				</property>
+				<property>
+					<name>mapred.reduce.tasks</name>
+					<value>1</value>
+				</property>
+				<property>
+					<name>NameNode</name>
+					<value>${nameNode}</value>
+				</property>
+			</configuration>
+			<main-class>com.mganaly.utils.MainRunner</main-class>
+			<arg>left_join_tool</arg>
+			<arg>redNum=1</arg>
+			
+			<arg>outpath=${outputPath}</arg>
+			<arg>outDate=${startDate}</arg>
+			
+			<arg>inpath=${outputTmp}/page_pose_content_visit</arg>
+			<arg>inpathR=${outputTmp}/page_pose_content_use</arg>
+			
+			<arg>mapCols= TERM_PROD_NAME, POSE_ID, POSE_NAME, PAGE_ID, PAGE_NAME, STATIS_DAY, CONTENT_ID, PROGRAM_NAME, VISIT_UV, VISIT_PV
+			</arg>
+			<arg>mapKeys= TERM_PROD_NAME, POSE_ID, POSE_NAME, PAGE_ID, PAGE_NAME, STATIS_DAY, CONTENT_ID, PROGRAM_NAME</arg>
+			<arg>mapVals= VISIT_UV, VISIT_PV</arg>
+
+			<arg>mapRCols=TERM_PROD_NAME, POSE_ID, POSE_NAME, PAGE_ID, PAGE_NAME, STATIS_DAY, CONTENT_ID, PROGRAM_NAME, USE_UV, USE_PV, USE_DUR, USE_FLOW
+			</arg>
+			<arg>mapRKeys= TERM_PROD_NAME, POSE_ID, POSE_NAME, PAGE_ID, PAGE_NAME, STATIS_DAY, CONTENT_ID, PROGRAM_NAME</arg>
+			<arg>mapRVals= USE_UV DEF ZERO, USE_PV DEF ZERO, USE_DUR DEF ZERO, USE_FLOW DEF ZERO</arg>
+
+			<capture-output />
+		</java>
+		<ok to="submitDatabase" />
+		<error to="fail" />
+	</action>
+	
+	<!--OUTPUT_COLS : 
+	TERM_PROD_NAME, POSE_ID, POSE_NAME, PAGE_ID, PAGE_NAME, STATIS_DAY, CONTENT_ID, PROGRAM_NAME, 
+	VISIT_UV, VISIT_PV,
+	USE_UV, USE_PV, USE_DUR, USE_FLOW
+	 -->
+	<action name="submitDatabase">
+		<java>
+			<job-tracker>${jobTracker}</job-tracker>
+			<name-node>${nameNode}</name-node>
+			<configuration>
+				<property>
+					<name>mapred.job.queue.name</name>
+					<value>${queue}</value>
+				</property>
+				<property>
+					<name>mapred.child.java.opts</name>
+					<value>-Xmx1024m</value>
+				</property>
+				<property>
+					<name>mapred.reduce.tasks</name>
+					<value>1</value>
+				</property>
+				<property>
+					<name>NameNode</name>
+					<value>${nameNode}</value>
+				</property>
+			</configuration>
+			<main-class>com.mganaly.utils.MainRunner</main-class>
+			<arg>mysql_table_submit</arg>
+			<arg>inDate=${startDate}</arg>
+			<arg>inpath=${outputPath}</arg>
+			<arg>tableName=td_internet_dep_recom_page_content_bill_daily</arg>
+			<arg>tableColNum=15</arg>
+			<capture-output />
+		</java>
+		<ok to="end" />
+		<error to="fail" />
+	</action>
+
+
+	<action name="cleanTempData">
+		<fs>
+			<delete path="${outputTmp}/genTestData/temp" />
+		</fs>
+		<ok to="end" />
+		<error to="end" />
+	</action>
+
+	<kill name="fail">
+		<message>Failed, error message[${wf:errorMessage(wf:lastErrorNode())}]
+		</message>
+	</kill>
+
+	<end name="end" />
+</workflow-app>

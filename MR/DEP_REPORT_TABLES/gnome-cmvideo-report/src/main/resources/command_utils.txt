@@ -1,0 +1,46 @@
+
+oozie job -oozie http://ddp-cm.cmdmp.com:11000/oozie/ -config job.properties -run
+
+
+oozie job -rerun 0004481-160406111724738-oozie-oozi-C -action 66 -oozie http://ddp-cm.cmdmp.com:11000/oozie/
+oozie job -rerun 0004481-160406111724738-oozie-oozi-C -action 73 -oozie http://ddp-cm.cmdmp.com:11000/oozie/
+oozie job -rerun 0004481-160406111724738-oozie-oozi-C -action 74 -oozie http://ddp-cm.cmdmp.com:11000/oozie/
+oozie job -rerun 0004481-160406111724738-oozie-oozi-C -action 75 -oozie http://ddp-cm.cmdmp.com:11000/oozie/
+oozie job -rerun 0004481-160406111724738-oozie-oozi-C -action 76 -oozie http://ddp-cm.cmdmp.com:11000/oozie/
+oozie job -rerun 0004481-160406111724738-oozie-oozi-C -action 77 -oozie http://ddp-cm.cmdmp.com:11000/oozie/
+
+
+
+/mobile/statistics/lib_mgr
+
+
+
+'{
+    "imei" : "1111111111111111",
+    "gender" : "male",
+    "age" : "18",
+    "salary":"10000"
+}'
+
+
+
+
+
+
+curl -XPOST 'http://dmpserver.ad.cmvideo.cn/migu/vgoptag/' -d '{
+    "imei" : "22222222222",
+    "gender" : "male",
+    "age" : "29",
+    "salary":"20000"
+}'
+
+
+curl -XGET 'http://dmpserver.ad.cmvideo.cn/migu/vgoptag/_search' -d '{
+    "query": {
+        "match": {
+            "gender": "male"
+        }
+    }
+}'
+
+

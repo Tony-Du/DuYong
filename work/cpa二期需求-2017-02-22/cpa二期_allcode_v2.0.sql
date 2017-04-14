@@ -80,6 +80,7 @@ select t1.rowkey
  where t1.src_file_day = '${SRC_FILE_DAY}' 
    and t1.src_file_hour = '${SRC_FILE_HOUR}'
    and nvl(t1.event_name, '') <> '';
+
    
 --------------------------------------------------------------------------------------------------------------
 
@@ -121,15 +122,7 @@ lateral view posexplode(split(regexp_replace(regexp_replace(t1.eventParams_json,
 as param_pos, param_key_val
 ) t3;
 
--- 测试
-select t.app_channel_id,t.app_os_type,t.product_key,t.event_name,t.param_name,t.param_val, count(1) as val_cnt
-from intdata.kesheng_event_params t 
-where src_file_day=20170325
-group by t.rowkey,t.app_ver_code,t.app_pkg_name,t.app_channel_id,t.app_os_type,t.event_name,t.param_pos,t.param_name,t.param_val,t.product_key;
-
-select * from app.cpa_event_params_daily a where a.src_file_day=
-
-
+-- 分割 param_name 和 param_val 出现问题
 --------------------------------------------------------------------------------------------------------------
 
 

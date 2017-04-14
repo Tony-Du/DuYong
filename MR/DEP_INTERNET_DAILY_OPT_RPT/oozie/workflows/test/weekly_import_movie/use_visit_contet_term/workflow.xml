@@ -1,0 +1,311 @@
+<workflow-app xmlns='uri:oozie:workflow:0.1' name='weekly_import_content_use_visit_contet_term'>
+		
+	<!-- Merge content_use_visit 
+	${outputTmp}/content_use_visit
+	 STATIS_DAY, CONTENT_ID, CONTENT_NAME, USE_UV, USE_PV, USE_DUR, VISIT_UV, VISIT_PV
+	-->
+
+	<start to="fork_content_use_visit" />
+	
+	<!-- 
+	<join name="join_content_use_visit" to="XXXXXX" />
+	-->
+	<fork name="fork_content_use_visit">
+		<path start="contet_use" />
+		<path start="content_visit" />
+	</fork>
+	
+	  
+
+	<!--OUTPUT_COLS : 
+	 (unused)SIN_CONTENT_ID, PROGRAM_ID,
+	 CONTENT_ID, CONTENT_NAME,
+	 STATIS_DAY, TERM_PROD_ID, USE_UV, USE_PV, USE_DUR
+	-->
+	<action name="contet_use">
+		<java>
+			<job-tracker>${jobTracker}</job-tracker>
+			<name-node>${nameNode}</name-node>
+			<prepare>
+				<delete path="${outputTmp}/contet_use" />
+			</prepare>
+			<configuration>
+				<property>
+					<name>mapred.job.queue.name</name>
+					<value>${queue}</value>
+				</property>
+				<property>
+					<name>mapred.child.java.opts</name>
+					<value>-Xmx1024m</value>
+				</property>
+				<property>
+					<name>mapred.reduce.tasks</name>
+					<value>1</value>
+				</property>
+				<property>
+					<name>NameNode</name>
+					<value>${nameNode}</value>
+				</property>
+			</configuration>
+			<main-class>com.mganaly.utils.MainRunner</main-class>
+			<arg>map_join_tool</arg>
+			
+			<arg>outpath=${outputTmp}/contet_use</arg>
+			
+			<arg>inpath=${outputTmp}/tdim_cont_name_sincon_prog</arg>
+			<arg>inpathR=${outputTmp}/usr_bill_detail,${outputTmp}/tourist_bill_detail</arg>
+			
+			<arg>mapCols=CONTENT_ID, CONTENT_NAME, SIN_CONTENT_ID, PROGRAM_ID</arg>
+			<arg>mapKeys=SIN_CONTENT_ID, PROGRAM_ID</arg>
+			<arg>mapVals=CONTENT_ID, CONTENT_NAME</arg>
+			
+			<arg>mapRCols=STATIS_DAY, CONTENT_ID, PROGRAM_ID, TERM_PROD_ID,
+		USE_DUR, USE_UV, USE_PV</arg>
+				
+			<arg>mapRKeys=CONTENT_ID, PROGRAM_ID</arg>
+			<arg>mapRVals=STATIS_DAY, TERM_PROD_ID, USE_UV, USE_PV, USE_DUR</arg>
+			
+			<capture-output />
+		</java>
+		<ok to="term_contet_use" />
+		<error to="fail" />
+	</action>
+	
+	<!--term_contet_use : 
+	 TERM_PROD_ID,
+	 TERM_VIDEO_TYPE_ID,
+	 CONTENT_ID, CONTENT_NAME, SIN_CONTENT_ID, PROGRAM_ID, STATIS_DAY, USE_UV, USE_PV, USE_DUR
+	-->
+	<action name="term_contet_use">
+		<java>
+			<job-tracker>${jobTracker}</job-tracker>
+			<name-node>${nameNode}</name-node>
+			<prepare>
+				<delete path="${outputTmp}/term_contet_use" />
+			</prepare>
+			<configuration>
+				<property>
+					<name>mapred.job.queue.name</name>
+					<value>${queue}</value>
+				</property>
+				<property>
+					<name>mapred.child.java.opts</name>
+					<value>-Xmx1024m</value>
+				</property>
+				<property>
+					<name>mapred.reduce.tasks</name>
+					<value>1</value>
+				</property>
+				<property>
+					<name>NameNode</name>
+					<value>${nameNode}</value>
+				</property>
+			</configuration>
+			
+			<main-class>com.mganaly.utils.MainRunner</main-class>
+			<arg>map_join_tool</arg>
+			
+			<arg>outpath=${outputTmp}/term_contet_use</arg>
+			
+			<arg>inpath=${outputTmp}/tdim_term_videotype</arg>
+			<arg>inpathR=${outputTmp}/contet_use</arg>
+			
+			<arg>mapCols= TERM_PROD_ID, TERM_VIDEO_TYPE_ID</arg>
+			<arg>mapKeys= TERM_PROD_ID</arg>
+			<arg>mapVals= TERM_VIDEO_TYPE_ID</arg>
+			
+			<arg>mapRCols= SIN_CONTENT_ID, PROGRAM_ID, CONTENT_ID, CONTENT_NAME, STATIS_DAY, TERM_PROD_ID, USE_UV, USE_PV, USE_DUR</arg>
+				
+			<arg>mapRKeys= TERM_PROD_ID</arg>
+			<arg>mapRVals= CONTENT_ID, CONTENT_NAME, SIN_CONTENT_ID, PROGRAM_ID, STATIS_DAY, USE_UV, USE_PV, USE_DUR</arg>
+			<capture-output />
+		</java>
+		<ok to="join_content_use_visit" />
+		<error to="fail" />
+	</action>
+	
+	<!--content_visit : 
+	${outputTmp}/content_visit
+	 PROGRAM_ID,
+	 CONTENT_ID, CONTENT_NAME, SIN_CONTENT_ID,
+	 STATIS_DAY, TERM_PROD_ID, VISIT_UV , VISIT_PV
+	-->
+	<action name="content_visit">
+		<java>
+			<job-tracker>${jobTracker}</job-tracker>
+			<name-node>${nameNode}</name-node>
+			<prepare>
+				<delete path="${outputTmp}/content_visit" />
+			</prepare>
+			<configuration>
+				<property>
+					<name>mapred.job.queue.name</name>
+					<value>${queue}</value>
+				</property>
+				<property>
+					<name>mapred.child.java.opts</name>
+					<value>-Xmx1024m</value>
+				</property>
+				<property>
+					<name>mapred.reduce.tasks</name>
+					<value>1</value>
+				</property>
+				<property>
+					<name>NameNode</name>
+					<value>${nameNode}</value>
+				</property>
+			</configuration>
+			
+			<main-class>com.mganaly.utils.MainRunner</main-class>
+			<arg>map_join_tool</arg>
+			
+			<arg>outpath=${outputTmp}/content_visit</arg>
+			
+			<arg>inpath=${outputTmp}/tdim_cont_name_sincon_prog</arg>
+			<arg>inpathR=${outputTmp}/usr_visit_detail, ${outputTmp}/tourist_visit_detail</arg>
+			
+			<arg>mapCols= CONTENT_ID, CONTENT_NAME, SIN_CONTENT_ID, PROGRAM_ID</arg>
+			<arg>mapKeys= PROGRAM_ID</arg>
+			<arg>mapVals= CONTENT_ID, CONTENT_NAME, SIN_CONTENT_ID</arg>
+			
+			<arg>mapRCols= STATIS_DAY, NODE_ID, TERM_PROD_ID, VISIT_UV , VISIT_PV</arg>
+				
+			<arg>mapRKeys= NODE_ID</arg>
+			<arg>mapRVals= STATIS_DAY, TERM_PROD_ID, VISIT_UV , VISIT_PV</arg>
+			<capture-output />
+		</java>
+		<ok to="term_contet_visit" />
+		<error to="fail" />
+	</action>
+	
+	
+	<!--term_contet_visit : 
+	${outputTmp}/term_contet_visit
+	 TERM_PROD_ID,
+	 TERM_VIDEO_TYPE_ID,
+	STATIS_DAY, CONTENT_ID, CONTENT_NAME, SIN_CONTENT_ID, PROGRAM_ID, VISIT_UV, VISIT_PV
+	-->
+	<action name="term_contet_visit">
+		<java>
+			<job-tracker>${jobTracker}</job-tracker>
+			<name-node>${nameNode}</name-node>
+			<prepare>
+				<delete path="${outputTmp}/term_contet_visit" />
+			</prepare>
+			<configuration>
+				<property>
+					<name>mapred.job.queue.name</name>
+					<value>${queue}</value>
+				</property>
+				<property>
+					<name>mapred.child.java.opts</name>
+					<value>-Xmx1024m</value>
+				</property>
+				<property>
+					<name>mapred.reduce.tasks</name>
+					<value>1</value>
+				</property>
+				<property>
+					<name>NameNode</name>
+					<value>${nameNode}</value>
+				</property>
+			</configuration>
+			
+			<main-class>com.mganaly.utils.MainRunner</main-class>
+			<arg>map_join_tool</arg>
+			
+			<arg>outpath=${outputTmp}/term_contet_visit</arg>
+			
+			<arg>inpath=${outputTmp}/tdim_term_videotype</arg>
+			<arg>inpathR=${outputTmp}/content_visit</arg>
+			
+			<arg>mapCols= TERM_PROD_ID, TERM_VIDEO_TYPE_ID</arg>
+			<arg>mapKeys= TERM_PROD_ID</arg>
+			<arg>mapVals= TERM_VIDEO_TYPE_ID</arg>
+			
+			<arg>mapRCols= PROGRAM_ID,
+			 CONTENT_ID, CONTENT_NAME, SIN_CONTENT_ID,
+			 STATIS_DAY, TERM_PROD_ID, VISIT_UV , VISIT_PV
+			 </arg>
+				
+			<arg>mapRKeys= TERM_PROD_ID</arg>
+			<arg>mapRVals= STATIS_DAY, CONTENT_ID, CONTENT_NAME, SIN_CONTENT_ID, PROGRAM_ID, VISIT_UV, VISIT_PV</arg>
+			<capture-output />
+		</java>
+		<ok to="join_content_use_visit" />
+		<error to="fail" />
+	</action>
+	
+	<join name="join_content_use_visit" to="content_use_visit" />
+	
+	<!-- Merge content_use_visit 
+	${outputTmp}/content_use_visit
+	 STATIS_DAY, CONTENT_ID, CONTENT_NAME,
+	 CNT:USE_UV, CNT:USE_PV, CNT:USE_DUR,
+	 VISIT_UV, VISIT_PV
+		-->
+	<action name="content_use_visit">
+		<java>
+			<job-tracker>${jobTracker}</job-tracker>
+			<name-node>${nameNode}</name-node>
+			<prepare>
+				<delete path="${outputTmp}/content_use_visit" />
+			</prepare>
+			
+			<configuration>
+				<property>
+					<name>mapred.job.queue.name</name>
+					<value>${queue}</value>
+				</property>
+				<property>
+					<name>mapred.child.java.opts</name>
+					<value>-Xmx1024m</value>
+				</property>
+				<property>
+					<name>mapred.reduce.tasks</name>
+					<value>1</value>
+				</property>
+				<property>
+					<name>NameNode</name>
+					<value>${nameNode}</value>
+				</property>
+			</configuration>
+			
+			<main-class>com.mganaly.utils.MainRunner</main-class>
+
+			<arg>left_join_tool</arg>
+			<arg>redNum=1</arg>
+			<arg>outpath=${outputTmp}/content_use_visit</arg>
+			
+			<arg>inpath=${outputTmp}/term_contet_use</arg>
+			<arg>inpathR=${outputTmp}/term_contet_visit/</arg>
+
+			<arg>mapCols= TERM_PROD_ID,
+							 TERM_VIDEO_TYPE_ID,
+							 CONTENT_ID, CONTENT_NAME, SIN_CONTENT_ID, PROGRAM_ID, STATIS_DAY, USE_UV, USE_PV, USE_DUR
+			</arg>
+			<arg>mapKeys= STATIS_DAY, CONTENT_ID, CONTENT_NAME, SIN_CONTENT_ID, PROGRAM_ID</arg>
+			<arg>mapVals= USE_UV, USE_PV, USE_DUR</arg>
+			<arg>redVals= CNT:USE_UV, CNT:USE_PV, CNT:USE_DUR</arg>
+			
+			<arg>mapRCols= TERM_PROD_ID,
+						 TERM_VIDEO_TYPE_ID,
+						STATIS_DAY, CONTENT_ID, CONTENT_NAME, SIN_CONTENT_ID, PROGRAM_ID, VISIT_UV, VISIT_PV
+			</arg>
+			<arg>mapRKeys= STATIS_DAY, CONTENT_ID, CONTENT_NAME, SIN_CONTENT_ID,PROGRAM_ID</arg>
+			<arg>mapRVals= VISIT_UV DEF ZERO, VISIT_PV DEF ZERO</arg>
+			<arg>redRVals= CNT:VISIT_UV, CNT:VISIT_PV</arg>
+
+			<capture-output />
+		</java>
+		<ok to="end" />
+		<error to="fail" />
+	</action>
+
+	<kill name="fail">
+		<message>Failed, error message[${wf:errorMessage(wf:lastErrorNode())}]
+		</message>
+	</kill>
+
+	<end name="end" />
+</workflow-app>

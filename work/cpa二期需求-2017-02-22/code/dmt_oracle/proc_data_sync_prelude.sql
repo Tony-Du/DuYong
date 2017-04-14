@@ -38,51 +38,42 @@ end;
 -- 如果我在表上增加个分区，则Oracle会自动维护分区的索引,注意此时加分区必须是用split,直接加会出错的。
 --  alter table test split partition p3 at (30000) into (partition p3, partition p4);
 
+/*
+oracle 字符串连接操作字符： ||
+(+): Oracle专用的连接符，在条件中出现在左边指右外联接，出现在右边指左外联接。
+
+伪列：在oracle的表的使用过程中，实际表中还有一些附加的列，称为伪列。
+
+ROWID与ROWNUM：
+ROWID 是插入记录时生成，ROWNUM 是查询数据时生成。
+ROWID 标识的是行的物理地址。ROWNUM标识的是查询结果中的行的次序。
 
 
+查询出工资最高的前5名员工的姓名、工作和工资。
+select ROWNUM, t.* from 
+	(select ename, job, sal from EMP order by sal desc) t
+where ROWNUM <= 5 ;
 
 
+检查授予用户的角色
+通过查询 user_role_privs 可以检查已经授予一个用户有哪些角色
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-create or replace procedure hive_oracle_partitions_tab (hiv_table_name in varchar2(64), src_file_day in varchar2(64))
-as 
-v_par_cnt number(8),
-v_sql varchar2(64)
-begin 
-select count(1) into v_par_cnt 
-from user_tab_partitions t1 
-where t1.table_name = hiv_table_name
-  and t1.partition_name = 'P_'||src_file_day;
-
-if v_par_cnt = 0 then 
-
+user_sys_privs 用户系统级权限表
   
-  
-  
-  
-  
+role_sys_privs 角色系统级权限表
+
+用ROWID删除重复数据
+
+
+
+
+
+
+
+
+
+
+
+
+
 

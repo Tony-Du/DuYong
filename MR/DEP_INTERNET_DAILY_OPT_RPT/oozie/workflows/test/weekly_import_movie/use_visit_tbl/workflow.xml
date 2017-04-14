@@ -1,0 +1,239 @@
+<workflow-app xmlns='uri:oozie:workflow:0.1' name='weekly_import_content_useVisitTbl'>
+	<!--/user/hadoop/public/migu_analyo_ly/out_temp/weekly_import_movie_use_detail 
+	
+	${outputTmp}/usr_bill_detail
+	COL:STATIS_DAY, COL:CONTENT_ID, COL:PROGRAM_ID, COL:TERM_PROD_ID, COL:USE_DUR,  COL:USE_UV, COL:USE_PV
+	-->
+	
+	<!-- tourist_bill_detail
+	${outputTmp}/tourist_bill_detail
+	COL:STATIS_DAY, COL:CONTENT_ID, COL:PROGRAM_ID, COL:TERM_PROD_ID, COL:USE_DUR, COL:USE_UV, COL:USE_PV
+	-->
+	
+	<!-- usr_visit_detail:
+	${outputTmp}/usr_visit_detail
+	COL:STATIS_DAY, COL:NODE_ID, COL:TERM_PROD_ID, COL:VISIT_UV , COL:VISIT_PV
+	-->	
+	
+	<!-- tourist_visit_detail: 
+	${outputTmp}/tourist_visit_detail
+	COL:STATIS_DAY, COL:NODE_ID, COL:TERM_PROD_ID, COL:VISIT_UV , COL:VISIT_PV
+	-->
+	<start to="fork_use_visit_content" />
+	
+	<!-- 
+	<join name="join_use_visit_content" to="XXXXXX" />
+	-->
+	<fork name="fork_use_visit_content">
+		<path start="usr_bill_detail" />
+		<path start="tourist_bill_detail" />
+		<path start="usr_visit_detail" />
+		<path start="tourist_visit_detail" />
+	</fork>
+	
+		<!-- usr_bill_detail:
+		${outputTmp}/usr_bill_detail
+		COL:STATIS_DAY, COL:CONTENT_ID, COL:PROGRAM_ID, COL:TERM_PROD_ID,
+		COL:USE_DUR, COL:USE_UV, COL:USE_PV
+		-->
+		<action name="usr_bill_detail">
+			<java>
+				<job-tracker>${jobTracker}</job-tracker>
+				<name-node>${nameNode}</name-node>
+				<prepare>
+					<delete path="${outputTmp}/usr_bill_detail" />
+				</prepare>
+				<configuration>
+					<property>
+						<name>mapred.job.queue.name</name>
+						<value>${queue}</value>
+					</property>
+					<property>
+						<name>mapred.child.java.opts</name>
+						<value>-Xmx1024m</value>
+					</property>
+					<property>
+						<name>mapred.reduce.tasks</name>
+						<value>1</value>
+					</property>
+					<property>
+						<name>NameNode</name>
+						<value>${nameNode}</value>
+					</property>
+				</configuration>
+		
+				<main-class>com.mganaly.utils.MainRunner</main-class>
+				<arg>td_aaa_bill_d_tool</arg>
+				
+				<arg>inDate= ${startDate}</arg>
+				<arg>outpath=${outputTmp}/usr_bill_detail</arg>
+				
+				<arg>inpath=${cdmpPath}/td_aaa_bill_d</arg>
+				<arg>mapKeys=STATIS_DAY, CONTENT_ID, PROGRAM_ID, TERM_PROD_ID</arg>
+				<arg>mapVals=USE_DUR, SERV_NUMBER, NUM:1</arg>
+				<arg>redVals=CNT:USE_DUR, SUM:SERV_NUMBER, CNT:1</arg>
+				
+				<capture-output />
+			</java>
+			<ok to="join_use_visit_content" />
+			<error to="fail" />
+		</action>
+		
+		<!-- tourist_bill_detail
+		${outputTmp}/tourist_bill_detail
+		COL:STATIS_DAY, COL:CONTENT_ID, COL:PROGRAM_ID, COL:TERM_PROD_ID,
+		COL:USE_DUR, COL:USE_UV, COL:USE_PV
+		-->
+		<action name="tourist_bill_detail">
+			<java>
+				<job-tracker>${jobTracker}</job-tracker>
+				<name-node>${nameNode}</name-node>
+				<prepare>
+					<delete path="${outputTmp}/tourist_bill_detail" />
+				</prepare>
+				<configuration>
+					<property>
+						<name>mapred.job.queue.name</name>
+						<value>${queue}</value>
+					</property>
+					<property>
+						<name>mapred.child.java.opts</name>
+						<value>-Xmx1024m</value>
+					</property>
+					<property>
+						<name>mapred.reduce.tasks</name>
+						<value>1</value>
+					</property>
+					<property>
+						<name>NameNode</name>
+						<value>${nameNode}</value>
+					</property>
+				</configuration>
+				
+				<main-class>com.mganaly.utils.MainRunner</main-class>
+				<arg>td_aaa_tourist_bill_d_tool</arg>
+				
+				<arg>inDate= ${startDate}</arg>
+				<arg>outpath=${outputTmp}/tourist_bill_detail</arg>
+				
+				<arg>inpath=${cdmpPath}/td_aaa_tourist_bill_d</arg>
+				<arg>mapKeys=COL:STATIS_DAY, COL:CONTENT_ID, COL:PROGRAM_ID, COL:TERM_PROD_ID</arg>
+				<arg>mapVals=COL:USE_DUR, COL:SERV_NUMBER, NUM:1</arg>
+				<arg>redVals=CNT:USE_DUR, SUM:SERV_NUMBER, CNT:1</arg>
+				
+				<capture-output />
+			</java>
+			<ok to="join_use_visit_content" />
+			<error to="fail" />
+		</action>
+		
+			
+
+		<!-- usr_visit_detail:
+		${outputTmp}/usr_visit_detail
+		COL:STATIS_DAY, COL:NODE_ID, COL:TERM_PROD_ID,
+		COL:VISIT_UV , COL:VISIT_PV
+		-->
+		<action name="usr_visit_detail">
+			<java>
+				<job-tracker>${jobTracker}</job-tracker>
+				<name-node>${nameNode}</name-node>
+				<prepare>
+					<delete path="${outputTmp}/usr_visit_detail" />
+				</prepare>
+				<configuration>
+					<property>
+						<name>mapred.job.queue.name</name>
+						<value>${queue}</value>
+					</property>
+					<property>
+						<name>mapred.child.java.opts</name>
+						<value>-Xmx1024m</value>
+					</property>
+					<property>
+						<name>mapred.reduce.tasks</name>
+						<value>1</value>
+					</property>
+					<property>
+						<name>NameNode</name>
+						<value>${nameNode}</value>
+					</property>
+				</configuration>
+				
+				<main-class>com.mganaly.utils.MainRunner</main-class>
+				<arg>td_pub_visit_log_d_tool</arg>
+				
+				<arg>inDate= ${startDate}</arg>
+				
+				<arg>inpath=${cdmpPath}/td_pub_visit_log_d</arg>
+				<arg>outpath=${outputTmp}/usr_visit_detail</arg>
+				
+				<arg>mapKeys=COL:STATIS_DAY, COL:NODE_ID, COL:TERM_PROD_ID</arg>
+				<arg>mapVals=COL:SERV_NUMBER, NUM:1</arg>
+				<arg>redVals=SUM:SERV_NUMBER, CNT:1</arg>
+				
+				<capture-output />
+			</java>
+			<ok to="join_use_visit_content" />
+			<error to="fail" />
+		</action>
+		
+		<!-- tourist_visit_detail: 
+		${outputTmp}/tourist_visit_detail
+		COL:STATIS_DAY, COL:NODE_ID, COL:TERM_PROD_ID,
+		COL:VISIT_UV , COL:VISIT_PV
+		-->
+		<action name="tourist_visit_detail">
+			<java>
+				<job-tracker>${jobTracker}</job-tracker>
+				<name-node>${nameNode}</name-node>
+				<prepare>
+					<delete path="${outputTmp}/tourist_visit_detail" />
+				</prepare>
+				<configuration>
+					<property>
+						<name>mapred.job.queue.name</name>
+						<value>${queue}</value>
+					</property>
+					<property>
+						<name>mapred.child.java.opts</name>
+						<value>-Xmx1024m</value>
+					</property>
+					<property>
+						<name>mapred.reduce.tasks</name>
+						<value>1</value>
+					</property>
+					<property>
+						<name>NameNode</name>
+						<value>${nameNode}</value>
+					</property>
+				</configuration>
+				
+				<main-class>com.mganaly.utils.MainRunner</main-class>
+				<arg>td_pub_visit_log_wd_tourist_d_tool</arg>
+				
+				<arg>inDate= ${startDate}</arg>
+				
+				<arg>inpath=${cdmpPath}/td_pub_tourist_visit_log_d</arg>
+				<arg>outpath=${outputTmp}/tourist_visit_detail</arg>
+				
+				<arg>mapKeys=COL:STATIS_DAY, COL:NODE_ID, COL:TERM_PROD_ID</arg>
+				<arg>mapVals=COL:SERV_NUMBER, NUM:1</arg>
+				<arg>redVals=SUM:SERV_NUMBER, CNT:1</arg>
+				
+				<capture-output />
+			</java>
+			<ok to="join_use_visit_content" />
+			<error to="fail" />
+		</action>
+			
+	
+	<join name="join_use_visit_content" to="end" />
+	
+	<kill name="fail">
+		<message>Failed, error message[${wf:errorMessage(wf:lastErrorNode())}]
+		</message>
+	</kill>
+
+	<end name="end" />
+</workflow-app>

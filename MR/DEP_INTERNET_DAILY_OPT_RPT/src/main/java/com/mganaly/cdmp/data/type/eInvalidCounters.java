@@ -1,0 +1,73 @@
+package com.mganaly.cdmp.data.type;
+
+public enum eInvalidCounters {
+	INV_LEN
+	, INV_NULL
+	, INV_STATIS_DAY
+	, INV_SERV_NUMBER
+	, INV_TOURIST_VISIT_ID
+	, INV_FLOAT
+	, INV_CHN_ID_NEW
+	, INV_TERM_PROV_ID
+	, INV_GATE_IP
+	, INV_PROGRAM_ID
+	, INV_CP_ID
+	, INV_CONTENT_STATUS
+	, INV_PROGRAM_TYPE
+	, INV_PLAY_TYPE
+	, INV_PROGRAM_NAME
+	, INV_CONTENT_NAME
+	, INV_DETAIL
+	, INV_KEY_WORDS
+	, INV_PRODUCT_ID
+	, INV_STUDIO_CONTROL_ID
+	, INV_SIN_ID
+	, INV_NEW_PRODUCT_ID
+	, INV_IMEI_NEW
+	, INV_TERM_TYPE
+	, INV_CONTENT_ID
+	, INV_CONTENT_TYPE
+	, INV_ICMS_ID
+	, INV_IS_ICMS
+	, INV_COPYRIGHT_ID
+	, INV_PAGE_ID
+	, INV_POSE_ID
+	, INV_USE_DUR
+	, INV_USE_FLOW
+	, INV_TERM_VIDEO_TYPE_ID
+	, INV_CON_CLASS
+	, INV_CON_CLASS_1_NAME
+	, INV_CON_CLASS_2_NAME
+	, INV_CON_TAG_1_NAME
+	, INV_CON_TAG_2_NAME
+	, INV_CON_TAG_3_NAME
+	, INV_CON_TAG_4_NAME
+	, INV_CON_TAG_5_NAME
+	, INV_CON_ATTR_2_NAME
+	, INV_CON_ATTR_2_VALUE
+	, INV_SHOW_OBJ_NAME
+	, INV_BILL_TIME
+	, INV_BILL_FEE
+	, INV_OPT_TYPE
+	, INV_PROV_ID
+	, INV_REGION_ID
+	, INV_CHARGE_TYPE
+	, INV_DURATION	
+	, INV_AllParser
+	, INV_ColArrayParser
+	, INV_SumParser
+	, INV_ColIdxParser
+	, INV_ColNameParser
+	, INV_FilterComparatorParser
+	, INV_NumParser
+	, INV_RegularExpParser
+	, INV_ReplaceStringParser
+	, INV_StringParser
+	, INV_SumCntParser
+	, INV_CntDistinctParser
+	, INV_NvlParser
+	, INV_AvaDaylyParser
+	, INV_DateParser
+	, INV_DecimalParser
+
+}
