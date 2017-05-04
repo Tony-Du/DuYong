@@ -1,4 +1,4 @@
-2017-04-10	Q(1):select 
+2017-04-10	Q(1): select 
                      a.phone_number as serv_number,
                      a.create_time as bill_time,
                      '-998' as broadcast_type,
@@ -56,8 +56,29 @@
 			M: hive.auto.convert.join 
 				是否根据输入小表的大小，自动将 Reduce 端的 Common Join 转化为 Map Join，从而加快大表关联小表的 Join 速度。 
 				默认值：false
+				（原因未知）
+				
+			
+2017-04-19	Q: BDI:外部命令参数执行异常（删除旧记录，重新启用调度时间，流程无法被调起来）
+			S: 关闭调度时间，导出流程，删除旧流程，再导入流程（被导出的那个），启用调度时间即可
 			
 			
+2017-04-20	Q(1): CPA2期，app层，分组排序出现错误
+			   row_number()over(partition by a.event_name, a.param_name, a.param_val order by a.val_cnt desc) param_val_rank
+			S: row_number()over(partition by a.event_name, a.param_name order by a.val_cnt desc) param_val_rank
+			   (test sql)select t.event_name, t.param_name, count(distinct t.param_val) 
+						   from app.cpa_event_params_last30_daily t 
+						  where t.src_file_day = '20170419' and t.event_name='tokenvalidate'
+						  group by t.event_name, t.param_name;
 			
-			
-			
+			Q(2): CPA2期，app层，如果出现 event_name 和 param_name 相同的情况，用java提取出来的数据，event那部分输出会被param部分覆盖
+			S：原因是java是通过key-value对放到以个总的map集合中，所以当key出现相同时，value会被覆盖
+			   重新定义接口
+			   
+
+2017-04-21	Q: param_name=timestamp时，param_val=2017-04-19 09， 而源数据中 timestamp的值为 2017-04-19 09:59:49:767 这种形式
+			   解析出现错误
+			S: 参考最新的 intdata.kesheng_event_params 的sql			   
+
+									 
+									 

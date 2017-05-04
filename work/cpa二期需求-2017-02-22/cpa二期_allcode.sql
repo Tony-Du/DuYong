@@ -154,18 +154,18 @@ with stg_kesheng_sec_event_param_json as
 )
 insert overwrite table intdata.kesheng_sec_event_params partition(src_file_day='${SRC_FILE_DAY}', src_file_hour='${SRC_FILE_HOUR}')
 select t3.rowkey
-,t3.app_ver_code
-,t3.app_pkg_name
-,t3.app_channel_id
-,t3.app_os_type
-,t3.event_name
-,t3.param_pos
-,t3.param_key_val[0] param_name
-,t3.param_key_val[1] param_val
-,t3.product_key
+      ,t3.app_ver_code
+      ,t3.app_pkg_name
+      ,t3.app_channel_id
+      ,t3.app_os_type
+      ,t3.event_name
+      ,t3.param_pos
+      ,t3.param_key_val[0] param_name
+      ,t3.param_key_val[1] param_val
+      ,t3.product_key
 from (select t1.rowkey ,t1.app_ver_code ,t1.app_pkg_name ,t1.app_channel_id
-,t1.app_os_type ,t1.event_name ,t1.product_key, p1.param_pos
-,split(p1.param_key_val, '\\s*:\\s*') param_key_val
+            ,t1.app_os_type ,t1.event_name ,t1.product_key, p1.param_pos
+            ,split(p1.param_key_val, '\\s*:\\s*') param_key_val
 from stg_kesheng_sec_event_param_json t1
 lateral view posexplode(split(regexp_replace(regexp_replace(t1.eventParams_json, '\\{|\\}', ''), '"', ''), '\\s*,\\s*')) p1 
 as param_pos, param_key_val

@@ -63,7 +63,7 @@ select a1.event_name
         select a.event_name
 			  ,a.param_name
 			  ,a.param_val
-			  ,row_number()over(partition by a.event_name, a.param_name, a.param_val order by a.val_cnt desc) param_val_rank
+			  ,row_number()over(partition by a.event_name, a.param_name order by a.val_cnt desc) param_val_rank
           from stg.cpa_event_params_daily_01 a
 		 where a.app_channel_id = '-1' and a.product_key= -1 and a.app_ver_code = '-1'
 	    ) a1
