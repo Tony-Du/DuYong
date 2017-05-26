@@ -80,5 +80,16 @@
 			   解析出现错误
 			S: 参考最新的 intdata.kesheng_event_params 的sql			   
 
-									 
+			
+2017-05-04	Q(1): 编写shell程序，实现从hdfs merge文件,放到本地,再上传至ftp上。
+			   上传到ftp时，使用mput命令，传了两个文件，就发生问题：EOF received; mput aborted
+			S: 关掉 交互功能：prompt off	
+			
+			Q(2): n=1
+				  seqnum=`echo ${subfile} | awk -F "-" -v n=$n '{printf("%06d",$NF+n)}'`
+				  按习惯用法,使用 '{print("%06d",$NF+n)}',不能实现
+		    S：print输出指定内容后换行，printf只输出指定内容后不换行
+			   print($NF+n),不支持"%06d"格式输出
+			
+			
 									 

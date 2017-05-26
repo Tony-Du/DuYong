@@ -22,7 +22,6 @@ else
     exit 1
 fi
 
-
 # 判断本地目标路径是否存在
 if ls ${local_path}/${data_time} 1> /dev/null 2>&1; then
     echo "The directory ${local_path}/${data_time} exists"
@@ -30,12 +29,6 @@ else
     echo "The directory ${local_path}/${data_time} does not exist, creates it"
 	mkdir -p ${local_path}/${data_time}
 fi
-
-#if [ ! -d "${local_path}/${data_time}" ]; then
-#  umask 0022
-#  mkdir -p ${local_path}/${data_time}
-#fi
-
 
 # 从hdfs下载文件到本地
 echo "cmd:hdfs dfs -getmerge file"
@@ -68,6 +61,8 @@ for file in ${temp_local_path}/${file_name}*; do
   echo "${data_file_name}|${bytes}|${lines}|${data_time}" 1>> ${temp_local_path}/${file_name}.verf
 done
 echo "999999" 1>> ${temp_local_path}/${file_name}.verf
+
+sed -i "s/\x7C/\x1F/g"  ${temp_local_path}/${file_name}.verf
 
 echo "The verf file info:"
 cat ${temp_local_path}/${file_name}.verf

@@ -31,6 +31,9 @@ from odsdata.ugc_order_item a
 --on a.productid = b.chrgprod_id --and b.dw_delete_flag = 'N'
 where source_file_create_day='${SRC_FILE_DAY}';
 
+--测试
+select user_num, product_id, valid_start_time, expire_time from intdata.ugc_order_item_daily where src_file_day = '20170520';  
+
 ---------------------------------------------------------
 
 set mapreduce.job.name=odsdata.ugc_order_item_${SRC_FILE_DAY};

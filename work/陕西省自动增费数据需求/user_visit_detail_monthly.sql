@@ -12,7 +12,7 @@ stored as textfile;
 insert overwrite table app.user_visit_detail_sx0290_monthly partition (src_file_month = ${SRC_FILE_MONTH})
 select a.serv_number as phone_number
       ,a.src_file_day as visit_date                             
-      ,nvl(c.term_video_type_name, '') as busi_prod_name	
+      ,nvl(c.term_video_type_name, 'other') as busi_prod_name	
   from rptdata.fact_user_visit_hourly a  
  inner join rptdata.dim_region b 
     on a.phone_city_id = b.region_id and b.prov_id = '0290'     --陕西省	

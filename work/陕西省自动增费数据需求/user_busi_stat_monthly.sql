@@ -69,7 +69,7 @@ select a.phone_number
   from (
          select t.usernum_id as phone_number
                ,b.region_name as city_name
-               ,nvl(c.term_video_type_name, '') as busi_prod_name        --业务产品名称，left join有null值
+               ,nvl(c.term_video_type_name, 'other') as busi_prod_name        --业务产品名称，left join有null值
                ,0 as info_fee                                            --信息费(元),有效小数限2位
                ,0 as login_cnt                                           --登录频次:访问天数
                ,t.duration_sec
@@ -87,12 +87,12 @@ select a.phone_number
          
          select t1.user_id as phone_number
                ,b1.region_name as city_name
-               ,nvl(c1.term_video_type_name, '') as busi_prod_name                   
+               ,nvl(c1.term_video_type_name, 'other') as busi_prod_name                   
                ,t1.amount as info_fee
                ,0 as login_cnt
                ,0 as duration_sec
                ,0 as flow_kb
-           from rptdata.fact_ugc_order_detail_daily t1   --按次 
+           from rptdata.fact_ugc_order_detail_daily t1   --按次 	fact_ugc_order_detail
           inner join rptdata.dim_region b1
              on t1.city_id = b1.region_id and b1.prov_id = '0290' --陕西省的ID 
            left join rpt.dim_term_prod_v c1
@@ -106,7 +106,7 @@ select a.phone_number
          
          select t2.serv_number as phone_number
                ,b2.region_name as city_name
-               ,nvl(c2.term_video_type_name, '') as busi_prod_name 
+               ,nvl(c2.term_video_type_name, 'other') as busi_prod_name 
                ,t2.amount as info_fee 
                ,0 as login_cnt
                ,0 as duration_sec
@@ -124,7 +124,7 @@ select a.phone_number
          
          select t3.serv_number as phone_number    
                ,b3.region_name as city_name
-               ,nvl(c3.term_video_type_name, '') as busi_prod_name  
+               ,nvl(c3.term_video_type_name, 'other') as busi_prod_name  
                ,0 as info_fee 
                ,count(distinct t3.src_file_day) as login_cnt
                ,0 as duration_sec
@@ -136,7 +136,7 @@ select a.phone_number
              on t3.term_prod_id = c3.term_prod_id   
           where t3.src_file_day >= '${MONTH_START_DAY}'
             and t3.src_file_day <= '${MONTH_END_DAY}'
-          group by t3.serv_number, b3.region_name, nvl(c3.term_video_type_name, '')
+          group by t3.serv_number, b3.region_name, nvl(c3.term_video_type_name, 'other')
        ) a
 group by a.phone_number, a.city_name, a.busi_prod_name;
 

@@ -1,8 +1,8 @@
 
 
 
-create or replace procedure proc_data_sync_prelude(v_table_name in varchar2, v_src_file_day in varchar2)
-/*==========================================================================+
+create or replace procedure proc_data_sync_prelude(v_table_name in varchar2, v_src_file_day in varchar2)	
+/*==========================================================================+								
 名    称: proc_data_sync_prelude
 内容摘要: 检查指定日期分区是否存在,不存在则创建;最后truncate分区
 调    用: 无
@@ -22,8 +22,8 @@ begin
      and t1.partition_name = 'P_'||v_src_file_day;
 
   if vs_part_cnt = 0 then
-    vs_sql := 'alter table '|| v_table_name ||' split partition p_max '
-             ||' at('|| to_char(to_date(v_src_file_day,'yyyymmdd')+1, 'yyyymmdd') ||')'
+    vs_sql := 'alter table '|| v_table_name ||' split partition p_max '                   --v_table_name: cpa_event_occur_daily 
+             ||' at('|| to_char(to_date(v_src_file_day,'yyyymmdd')+1, 'yyyymmdd') ||')'   --v_src_file_day: 20170501
              ||' into(partition p_'|| v_src_file_day ||', partition p_max)';
   execute immediate vs_sql;
   end if;
@@ -35,8 +35,15 @@ end;
 /
 
 
+-- alter table cpa_event_occur_daily split partition p_max at(21070502) into (partition p_20170501, partition p_max);
+-- alter table cpa_event_occur_daily truncate partition p_20170501
+
 -- 如果我在表上增加个分区，则Oracle会自动维护分区的索引,注意此时加分区必须是用split,直接加会出错的。
 --  alter table test split partition p3 at (30000) into (partition p3, partition p4);
+当要在两个已知的分区中创建分区，需要手动创建分区
+alter table fact_live_program_rating_daily split partition P_20170426 at(20170426)
+into(partition P_20170425, partition P_20170427)
+
 
 /*
 oracle 字符串连接操作字符： ||

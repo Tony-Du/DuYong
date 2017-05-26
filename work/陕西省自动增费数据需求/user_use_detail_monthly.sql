@@ -17,7 +17,7 @@ stored as textfile;
 insert overwrite table app.user_use_detail_sx0290_monthly partition (src_file_month = ${SRC_FILE_MONTH})
 select a.usernum_id as phone_number                         --手机号码
       ,a.use_begin_time                                     --使用时间(精确到秒)
-      ,nvl(d.term_video_type_name, '') as busi_prod_name    --业务产品名称
+      ,nvl(d.term_video_type_name, 'other') as busi_prod_name    --业务产品名称
 	  ,a.content_id                                         --播放内容id
       ,nvl(c.content_name, '') as content_name              --播放内容
       ,round(a.duration_sec/60, 2) as duration_min          --播放时长(分钟)
@@ -51,7 +51,7 @@ play_session_id         string            --播放会话ID
 usernum_id              string            --用户号码         !!!
 user_id                 string            --用户ID            
 user_type_id            string            --用户类型            
-broadcast_type_id       string            --播放方式            
+broadcast_type_id       string            --播放方式          12  
 use_begin_time          string            --播放开始时间          
 use_end_time            string            --播放结束时间          
 duration_sec            bigint            --播放时长        !!! 
