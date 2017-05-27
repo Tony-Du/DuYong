@@ -61,7 +61,7 @@ select
     SUM(case when (bb.natural_develop_boss_add_order_user_flag = 'Y') then 1 else 0 end) as natural_develop_boss_add_order_user_num,
     SUM(case when (bb.prov_develop_boss_month_in_order_user_flag = 'Y') then 1 else 0 end) as prov_develop_boss_month_in_order_user_num,
     SUM(case when (bb.natural_develop_boss_month_in_order_user_flag = 'Y') then 1 else 0 end) as natural_develop_boss_month_in_order_user_num,
-    SUM(case when (bb.idea_pay_user_flag ='Y') then 1 else 0 end) as idea_pay_user_num,
+    SUM(case when (bb.boss_pay_user_flag ='Y') then 1 else 0 end) as idea_pay_user_num,
     cast(bb.dim_group_id as int) & 2147483647 as dim_group_id
 from ( 
     select 
