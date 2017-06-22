@@ -1,0 +1,15 @@
+
+`ods`.`ugc_50101_payment_json_ex` |--> `ods.ugc_50101_payment_v` |--> intdata.payment_hist  |
+                                                                                            | --> rptdata.fact_order_detail     ---------------------------------------------------|
+`ods`.`ugc_50201_order_json_ex`   |--> `ods.ugc_50201_order_v`   |--> intdata.order_hist    |                                                                                      |
+                                                                 |                                                                                                                 |
+                                                                 |--> odsdata.ugc_50201_order |--> `ods.ugc_50201_order_item_delivery_v` |--> intdata.order_item_delivery_hist ----|--> rptdata.fact_order_item_detail
+                                                                                              |--> `ods.ugc_50201_order_item_v` |--> intdata.order_item_hist ----------------------|
+																			                  |--> ods.ugc_50201_order_payment_channel_v |--> intdata.order_payment_channel_hist --|                
+                                                                                                                                
+																																             
+																																
+																																
+																																
+ods.ugc_20102_contract_ex																																
+

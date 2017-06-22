@@ -1,0 +1,27 @@
+
+
+齐民友教授写的《重温微积分》
+
+import numpy as np
+
+创建数组：
+1.np.array(): 传入的参数是 一切序列型对象
+2.np.zeros()\np.ones()\np.empty(): 注意这里传进去的参数是表示形状的元组
+3.numpy.random.randn(m,n): 生成一些正态分布的随机数据，m*n维
+4.arange是内置函数range的数组版: np.arange(n): 生成0-n不包括n的一维数组
+
+
+np.random.normal(size=(4,4)): 标准正态分布的4*4样本数组
+
+
+随机漫步：
+从0开始，步长1和-1出现的概率相等，利用内置的random模块以纯python的方式实现1000步的随机漫步：
+import random
+origin_position = 0
+steps = 1000
+walk = [position]
+
+for i in xrang(steps):
+    step = 1 if random.randint(0,1) else -1
+	origin_position += step
+	walk.append(origin_position)

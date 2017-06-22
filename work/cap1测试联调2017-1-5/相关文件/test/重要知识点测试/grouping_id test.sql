@@ -16,9 +16,9 @@ month	day			cookieid
 2015-04,2015-04-16,cookie1
 
 CREATE EXTERNAL TABLE dy1234 (
-month STRING,
-day STRING, 
-cookieid STRING 
+ month    STRING,
+ day      STRING, 
+ cookieid STRING 
 ) ROW FORMAT DELIMITED 
 FIELDS TERMINATED BY ',' 
 stored as textfile location '/tmp/tony11/';

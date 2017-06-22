@@ -47,12 +47,12 @@ select  t.user_type
         select a.user_type
               ,a.network_type
               ,a.cp_id
-              ,a.use_type                                                      t.user_type    ----> user_type_id
-              ,a.term_prod_id                                                  t.network_type ----> net_type_id
-              ,a.term_version_id                                               t.use_type     ---->    broadcast_type_id
-              ,a.chn_id                                                        t.pay_chn_type  ---> ???        
-              ,a.city_id                                                       t.currency      ---> pay_currency_id     
-              ,a.sub_busi_id                                                   t.substatus   ---> order_sub_status 
+              ,a.use_type                  
+              ,a.term_prod_id              
+              ,a.term_version_id           
+              ,a.chn_id                    
+              ,a.city_id                   
+              ,a.sub_busi_id               
               ,a.user_id           
               ,a.period_unit       
               ,a.pay_chn_type      
