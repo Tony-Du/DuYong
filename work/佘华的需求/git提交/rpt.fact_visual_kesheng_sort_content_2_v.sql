@@ -27,6 +27,8 @@ select a.src_file_day                                                --日期
     on a.product_id = d5.chrgprod_id
   left join (select distinct prov_name, prov_id from rptdata.dim_region) p
     on a.ip_province_id = p.prov_id
+ --where a.src_file_day <= from_unixtime(unix_timestamp(),'yyyyMMdd') 
+   --and a.src_file_day > from_unixtime(unix_timestamp() - 14*24*60*60, 'yyyyMMdd')
  group by src_file_day
          ,prov_name
          ,term_video_type_name

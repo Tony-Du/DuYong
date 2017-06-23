@@ -12,6 +12,7 @@ set hive.exec.parallel=true;
 set hive.merge.mapfiles=true;
 set hive.merge.mapredfiles=true;
 
+--合约月全量
 INSERT overwrite TABLE intdata.contract_monthly_snapshot PARTITION (src_file_month='${month}')
 SELECT regexp_replace(id, '(ObjectId\\()|\\)', '') contract_id,  --合约id（主键）
        case when signTime in ('0', '-1') then null else signTime end as sign_unix_time, --签约时间
@@ -155,7 +156,29 @@ from `ods`.`ugc_20101_contract_ex`  --合约表（日增量）
 
 
 
-2017-06-20 00:00:07.919 [http-nio-18777-exec-15] BIGDATA cn.cmvideo.ugc.contract.dao.imp.ContractDaoImp - {"contractStatus":"NORMAL","cpId":"699201","createTime":1439129124000,"deliveryId":"252678560_8615086818502_699201_1520230047_20150809220524_CUTOVER_CONTRACTDELIVERY","effectTime":1497888007918,"endTime":-1,"id":"8615086818502_699201_1520230047_20150809220524_cutover_contractID","lastResumeTime":1497888007918,"lastSuspendTime":1497887500293,"lastUpdateTime":1497888007918,"msisdn":"8615086818502","operCode":"1520230047","operateStatus":"NORMAL","orderId":"252678560_2028595051-cutover_ItemPurchaseOrder","provinceId":"230","signTime":0,"type":"MOBILE_BOSS"}	
+2017-06-20 00:00:07.919 [http-nio-18777-exec-15] BIGDATA cn.cmvideo.ugc.contract.dao.imp.ContractDaoImp - 
+    {
+	 "contractStatus":"NORMAL",
+     "cpId":"699201",
+	 "createTime":1439129124000,
+	 "deliveryId":"252678560_8615086818502_699201_1520230047_20150809220524_CUTOVER_CONTRACTDELIVERY",
+	 "effectTime":1497888007918,
+	 "endTime":-1,
+	 "id":"8615086818502_699201_1520230047_20150809220524_cutover_contractID",
+	 "lastResumeTime":1497888007918,
+	 "lastSuspendTime":1497887500293,
+	 "lastUpdateTime":1497888007918,
+	 "msisdn":"8615086818502",
+	 "operCode":"1520230047",
+	 "operateStatus":"NORMAL",
+	 "orderId":"252678560_2028595051-cutover_ItemPurchaseOrder",
+	 "provinceId":"230",
+	 "signTime":0,
+	 "type":"MOBILE_BOSS"
+	}	
 20170620
-2017-06-20 00:00:07.950 [http-nio-18777-exec-14] BIGDATA cn.cmvideo.ugc.contract.dao.imp.ContractDaoImp - {"contractStatus":"CANCELLED","cpId":"699009","createTime":1469857000000,"deliveryId":"673391423_8613965192409_699009_30830153_20160730133640_CUTOVER_CONTRACTDELIVERY","effectTime":1497888007950,"endTime":1497888007950,"id":"8613965192409_699009_30830153_20160730133640_cutover_contractID","lastResumeTime":0,"lastSuspendTime":0,"lastUpdateTime":1497888007950,"msisdn":"8613965192409","operCode":"30830153","operateStatus":"SUSPENDED","orderId":"673391423_2028597606-cutover_ItemPurchaseOrder","provinceId":"551","signTime":0,"type":"MOBILE_BOSS"}	
+
+
+2017-06-20 00:00:07.950 [http-nio-18777-exec-14] BIGDATA cn.cmvideo.ugc.contract.dao.imp.ContractDaoImp - 
+{"contractStatus":"CANCELLED","cpId":"699009","createTime":1469857000000,"deliveryId":"673391423_8613965192409_699009_30830153_20160730133640_CUTOVER_CONTRACTDELIVERY","effectTime":1497888007950,"endTime":1497888007950,"id":"8613965192409_699009_30830153_20160730133640_cutover_contractID","lastResumeTime":0,"lastSuspendTime":0,"lastUpdateTime":1497888007950,"msisdn":"8613965192409","operCode":"30830153","operateStatus":"SUSPENDED","orderId":"673391423_2028597606-cutover_ItemPurchaseOrder","provinceId":"551","signTime":0,"type":"MOBILE_BOSS"}	
 20170620

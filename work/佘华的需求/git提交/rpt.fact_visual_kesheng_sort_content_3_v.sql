@@ -22,12 +22,14 @@ select a.src_file_day                                                --日期
     on a.content_id = d2.content_id
   left join rptdata.dim_content_copyright d3    --内容版权维表
     on d2.copyright_provider = d3.copyright_id
-  left join rptdata.dim_visual_content_class_new_d d4   --内容分类维表
+  left join rptdata.dim_visual_content_class_new_d d4  --内容分类维表
     on a.content_id = d4.content_id
   left join rptdata.dim_charge_product d5       --计费产品维表
     on a.product_id = d5.chrgprod_id
   left join (select distinct prov_name, prov_id from rptdata.dim_region) p
     on a.ip_province_id = p.prov_id
+ --where a.src_file_day <= from_unixtime(unix_timestamp(),'yyyyMMdd') 
+   --and a.src_file_day > from_unixtime(unix_timestamp() - 14*24*60*60, 'yyyyMMdd')
  group by src_file_day
          ,prov_name
          ,term_video_type_name
