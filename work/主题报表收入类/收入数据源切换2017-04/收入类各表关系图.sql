@@ -15,11 +15,11 @@ ods.ugc_50201_order_json_ex   -> ods.ugc_order_v            -> odsdata.ugc_order
 							  -> ods.ugc_order_paychannel_v -> odsdata.ugc_order_paychannel -> intdata.ugc_order_paychannel_daily |-> rptdata.fact_ugc_order_detail_daily (ugc按次all + ugc包月 + aaa包月) |-> rptdata.fact_ugc_order_amount_daily
 ods.ugc_50101_payment_json_ex -> ods.ugc_payment_v          -> odsdata.ugc_payment          -> intdata.ugc_payment_daily          |
 							                                   ods.aaa_10105_order_log_ex   -> intdata.aaa_order_log              |
-															   
+											(用户定购信息)				   
 									ods.aaa_10104_order_ex (union all)  |-> intdata.ugc_90104_monthorder_union |-> intdata.ugc_order_relation (存量) |-> rptdata.fact_ugc_order_relation_detail_daily |-> rptdata.fact_ugc_order_relation_amount_daily 
-ods.ugc_50201_order_ex			|-> intdata.ugc_90104_MonthOrder        |      
-ods.ugc_10106_goodsinfo_raw_ex  |
-ods.aaa_10112_userid_usernum_ex |
+ods.ugc_50201_order_ex(订单组件话单)|-> intdata.ugc_90104_MonthOrder    |      
+ods.ugc_10106_goodsinfo_raw_ex(销售系统商品信息)      |
+ods.aaa_10112_userid_usernum_ex(userid_usernum对应表) |
 
 intdata.ugc_order_daily            |
 intdata.ugc_order_item_daily       |-> intdata.ugc_tpp_contract (第三方包月新增)|->   rptdata.fact_ugc_tpp_in_order_detail_daily (该天第三方包月在定订单) -- 第三方
