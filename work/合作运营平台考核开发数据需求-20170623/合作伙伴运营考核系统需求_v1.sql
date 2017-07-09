@@ -154,7 +154,7 @@ select a.business_id
 
 --稽核1、2
 --当月 该业务下 每个人 使用流量kb/使用时长s
-insert overwrite table cdmpview.tmp_dy_05_check_1_2 
+insert overwrite table cdmpview.qspt_hzyykh_05_check_1_2 
 select substr('${MONTH_START_DAY}', 1, 6) statis_month  --201705
       ,b.business_id
       ,fud.usernum_id
@@ -171,7 +171,7 @@ select substr('${MONTH_START_DAY}', 1, 6) statis_month  --201705
          
                  
 --稽核3   
-insert overwrite table cdmpview.tmp_dy_05_check_3 
+insert overwrite table cdmpview.qspt_hzyykh_05_check_3 
 select substr('${MONTH_START_DAY}',1,6) as statis_month
       ,a.business_id
       ,sum(case when a.rn <= 3 then a.check_3_u_num else 0 end) as in_3_check_num
@@ -203,10 +203,10 @@ group by a.business_id
 
 
 --稽核4   
-insert overwrite table cdmpview.tmp_dy_05_check_4 
+insert overwrite table cdmpview.qspt_hzyykh_05_check_4 
 select substr('${MONTH_START_DAY}',1,6) as statis_month
       ,a.business_id
-      ,sum(case when a.rn <= 3 then a.check_4_num else 0 end) as in_3_check_4_num
+      ,sum(case when a.rn <= 3 then a.check_4_num else 0 end) as in_3_check_num
       ,sum(a.check_4_num) as all_check_4_num
   from (
         select t.business_id
@@ -234,32 +234,25 @@ group by a.business_id
 
 
 --Assess_1
---累计新增收入:自2017年4月1日起至考核当月累计新增收入
+--累计新增收入:自2017年4月1日起至考核当月累计新增收入 
 
-insert overwrite table cdmpview.tmp_dy_05_assess_1_add_revenue partition (src_file_month = '${SRC_FILE_MONTH}')  
-select t.statis_month
-      ,t.business_id
-      ,sum(t.accu_add_revenue) as accu_add_revenue --累计新增收入
-  from (
-        select '${SRC_FILE_MONTH}' as statis_month
-              ,sb.business_id
-              ,sum(a.payment_amt) as accu_add_revenue
-          from rptdata.fact_order_item_detail a
-          join rptdata.dim_sub_busi sb
-            on a.sub_business_id = sb.sub_busi_id
-         where substr(a.src_file_day, 1, 6) = '${SRC_FILE_MONTH}'  --当月
-           and a.order_status in (5,9)
-         group by sb.business_id
-         
-         union all
-         
-        select a.statis_month
-              ,a.business_id
-              ,a.accu_add_revenue
-          from cdmpview.tmp_dy_05_assess_1_add_revenue a
-         where (substr('${SRC_FILE_MONTH}', 5, 2) <> '04' and a.src_file_month = '${LAST_MONTH}') --当月不是4月份时， 取上月的累计新增收入
-       ) t                   
- group by t.statis_month, t.business_id
+insert overwrite table cdmpview.qspt_hzyykh_05_assess_1   
+select substr('${MONTH_END_DAY}', 1, 6) as statis_month
+      ,b.business_id
+      ,sum(a.payment_amt) as accu_add_revenue --分
+  from rptdata.fact_order_item_detail a
+  join busi_sub_busi b
+    on a.sub_business_id = b.sub_busi_id
+ where case when substr('${MONTH_END_DAY}', 5, 2) < '04' 
+            then (a.src_file_day >= concat(substr(add_months(concat_ws('-', substr('${MONTH_END_DAY}', 1, 4), substr('${MONTH_END_DAY}', 5, 2), '01'), -12), 1, 4), '0401') 
+                  and a.src_file_day <= '${MONTH_END_DAY}'
+                 ) -- 上一年的4月1号 到 当前统计月最后一天
+            else (a.src_file_day >= concat(substr('${MONTH_END_DAY}', 1, 4), '0401') and 
+                  a.src_file_day <= '${MONTH_END_DAY}'
+                 ) -- 今年的4月1号 到 当前统计月最后一天
+             end 
+   and a.order_status in (5,9)
+ group by b.business_id
 
          
 
@@ -267,7 +260,7 @@ select t.statis_month
 --使用用户数与在订付费用户比例:
 --分子为考核月使用合作伙伴业务的 注册用户数，分母为考核月月末合作伙伴业务 付费在订用户数
 
-insert overwrite table cdmpview.tmp_dy_05_Assess_2_u 
+insert overwrite table cdmpview.qspt_hzyykh_05_Assess_2_u 
 select substr('${MONTH_START_DAY}', 1, 6) as statis_month
       ,a.business_id
       ,count(a.usernum_id) as use_user_cnt --当月 稽核后的 使用合作伙伴业务的 注册用户数
@@ -293,7 +286,7 @@ select substr('${MONTH_START_DAY}', 1, 6) as statis_month
                  ,b.business_id
                  ,fud.usernum_id         
        ) a
-  join cdmpview.tmp_dy_05_check_1_2 b
+  join cdmpview.qspt_hzyykh_05_check_1_2 b
     on a.usernum_id = b.usernum_id and a.business_id = b.business_id
  where a.dept = '合作运营部' 
    and b.flow_kb >= '${FLOW_THRESHOLD_KB}'      --0.3*1024 --使用流量阈值
@@ -302,41 +295,41 @@ select substr('${MONTH_START_DAY}', 1, 6) as statis_month
 
          
          
-insert overwrite table cdmpview.tmp_dy_05_Assess_2_order       
-select substr('${MONTH_END_DAY}', 1, 6) as statis_month
+insert overwrite table cdmpview.qspt_hzyykh_05_Assess_2_order       
+select substr('${MONTH_START_DAY}', 1, 6) as statis_month
       ,t.business_id 
-      ,count(t.usernum) as in_order_user_cnt
+      ,count(t.order_user_id) as in_order_user_cnt
   from (
         select b.business_id
-              ,a.usernum           --考核月月末 合作伙伴业务付费 在订用户号码
-          from intdata.ugc_90104_monthorder_union a  --注意
+              ,a.order_user_id        --考核月月末 合作伙伴业务付费 在订用户号码
+          from rptdata.fact_order_daily_snapshot a
           join rptdata.dim_charge_product c
             on a.product_id = c.chrgprod_id 
           join busi_sub_busi b
             on c.sub_busi_bdid = b.sub_busi_id 
-         where a.src_file_day = '${MONTH_END_DAY}'    --20170531
-           and a.order_status <> '4'
+         where a.snapshot_day >= '${MONTH_START_DAY}' and a.snapshot_day <= '${MONTH_END_DAY}' 
            and c.chrgprod_price > 0 
          group by b.business_id,
-                  a.usernum
+                  a.order_user_id
        ) t
- group by t.business_id 
+ group by t.business_id
 
 
-insert overwrite TABLE cdmpview.tmp_dy_05_Assess_2 
-SELECT nvl(u.statis_month, o.statis_month ) statis_month
+ 
+insert overwrite TABLE cdmpview.qspt_hzyykh_05_Assess_2 
+SELECT nvl(u.statis_month, o.statis_month) statis_month
       ,nvl(u.business_id, o.business_id) business_id
       ,nvl(u.use_user_cnt, 0) use_user_cnt
       ,nvl(o.in_order_user_cnt, 0) in_order_user_cnt
-      ,case when nvl(o.in_order_user_cnt, 0) = 0 then 0 else nvl(u.use_user_cnt, 0)/o.in_order_user_cnt end as use_in_order_user_rate --使用用户数与在订付费用户比例
-  FROM cdmpview.tmp_dy_05_Assess_2_u u 
-  FULL JOIN cdmpview.tmp_dy_05_Assess_2_Order o
+      ,case when nvl(o.in_order_user_cnt, 0) = 0 then 0 
+            else nvl(u.use_user_cnt, 0)/o.in_order_user_cnt end as use_in_order_user_rate --使用用户数与在订付费用户比例
+  FROM cdmpview.qspt_hzyykh_05_Assess_2_u u 
+  FULL JOIN cdmpview.qspt_hzyykh_05_Assess_2_Order o
     ON u.business_id = o.business_id;
 
     
 --Assess_3
 --访问活跃度 日均访问用户数/月剔重访问用户数
-
 
 with assess_3_detail as (
 select case when tp.term_prod_name in ('和视频OPENAPI', '和视频SDK') then nvl(dc.dept_name,'9999') 
@@ -363,7 +356,7 @@ select case when tp.term_prod_name in ('和视频OPENAPI', '和视频SDK') then 
          ,fuvh.user_key
          ,fuvh.user_type_id
 )
-insert overwrite table cdmpview.tmp_dy_05_Assess_3_d 
+insert overwrite table cdmpview.qspt_hzyykh_05_Assess_3_d 
 select substr('${MONTH_START_DAY}', 1, 6) as statis_month
       ,t.business_id 
       ,sum(t.visit_user_cnt)/cast(substr('${MONTH_END_DAY}',7,2) as int) as day_avg_visit_user_cnt --当月 日均访问用户数
@@ -380,7 +373,7 @@ select substr('${MONTH_START_DAY}', 1, 6) as statis_month
  group by t.business_id    
          
                  
-insert overwrite table cdmpview.tmp_dy_05_Assess_3_m 
+insert overwrite table cdmpview.qspt_hzyykh_05_Assess_3_m 
 select substr('${MONTH_START_DAY}', 1, 6) as statis_month
       ,t.business_id
       ,sum(t.login_visit_user_cnt) as login_visit_user_cnt --当月 剔重 注册访问用户数
@@ -389,20 +382,59 @@ select substr('${MONTH_START_DAY}', 1, 6) as statis_month
         select a.business_id
               ,case when a.user_type_id = '1' then count(distinct a.user_key) else 0 end as login_visit_user_cnt --当月 剔重 注册访问用户数
               ,count(distinct a.user_key) visit_user_cnt  --当月 剔重 访问用户数
-          from assess_3_detail a         
+          from assess_3_detail a 
          where a.dept = '合作运营部'
          group by a.business_id
                  ,a.user_type_id
        ) t
- group by t.business_id    
-         
+ group by t.business_id 
+
+
+insert overwrite TABLE cdmpview.qspt_hzyykh_05_Assess_3
+select nvl(d.statis_month, m.statis_month) as statis_month
+      ,nvl(d.business_id, m.business_id) as business_id
+      ,nvl(d.day_avg_visit_user_cnt, 0) as day_avg_visit_user_cnt
+      ,nvl(m.login_visit_user_cnt, 0) as login_visit_user_cnt   --当月 剔重 注册访问用户数
+      ,nvl(m.visit_user_cnt, 0) as visit_user_cnt
+      ,case when nvl(m.visit_user_cnt, 0) = 0 then 0 
+            else nvl(d.day_avg_visit_user_cnt, 0)/m.visit_user_cnt end as activ_visit --访问活跃度：日均访问用户数/月剔重访问用户数
+      ,case when nvl(m.visit_user_cnt, 0) = 0 then 0 
+            else 1 - (nvl(m.login_visit_user_cnt, 0)/m.visit_user_cnt) end as tourist_rate --游客占比
+  from cdmpview.qspt_hzyykh_05_Assess_3_d d
+  full join cdmpview.qspt_hzyykh_05_Assess_3_m m 
+    on d.business_id = m.business_id
+
+
+--查询语句       
+select  a1.statis_month
+       ,nvl(a1.business_id, a2.business_id) as business_id
+	   ,nvl(a1.accu_add_revenue, 0) as accu_add_revenue             --累计新增收入
+       ,nvl(a2.use_in_order_user_rate, 0) as use_in_order_user_rate --使用用户数与在订付费用户比例
+       ,nvl(a3.activ_visit, 0) as activ_visit                       --访问活跃度：日均访问用户数/月剔重访问用户数 
+       ,nvl(a3.tourist_rate, 0) as tourist_rate                     --稽核5，游客占比
+       ,case when c3.all_check_3_num = 0 then 0 
+             else c3.in_3_check_num/c3.all_check_3_num  
+              end as propo_3_ip_use                                 --稽核3，ip前3名占比
+       ,case when c4.all_check_4_num =0 then 0
+             else c4.in_3_check_num /c4.all_check_4_num  
+              end as propo_3_ip_visit                               --稽核4，ip前3名占比 									            
+  from cdmpview.qspt_hzyykh_05_Assess_1 a1
+  full join cdmpview.qspt_hzyykh_05_Assess_2 a2
+    on a1.business_id = a2.business_id  
+  full join cdmpview.qspt_hzyykh_05_Assess_3 a3
+    on nvl(a1.business_id, a2.business_id) = a3.business_id  
+  left join cdmpview.qspt_hzyykh_05_check_3 c3
+    on nvl(a1.business_id, a2.business_id) = c3.business_id
+  left join cdmpview.qspt_hzyykh_05_check_4 c4
+    on nvl(a1.business_id, a2.business_id) = c4.business_id
+    
 
 --Assess_4
 --节目观看次数均值  节目人均使用次数/当月上传节目数量
 insert overwrite table cdmpview.tmp_dy_05_Assess_4 
 select substr('${MONTH_START_DAY}', 1, 6) as statis_month
       ,t.business_id
-      ,(t.assess_4_cnt/t.assess_4_user_num)/t.assess_4_pr_num as prog_watch_avg_cnt --节目观看次数均值
+      ,round((t.assess_4_cnt/t.assess_4_user_num)/t.assess_4_pr_num, 2) as prog_watch_avg_cnt --节目观看次数均值
   from (
         select p.program_id as business_id   
               ,count(distinct a.usernum_id) as assess_4_user_num  --使用用户数
@@ -416,12 +448,13 @@ select substr('${MONTH_START_DAY}', 1, 6) as statis_month
          group by p.program_id 
        ) t
 
+       
 --Assess_5
 --节目观看时长均值  节目人均使用时长/当月上传节目数量
 insert overwrite table cdmpview.tmp_dy_05_Assess_5 
 select substr('${MONTH_START_DAY}', 1, 6) as statis_month
       ,t.business_id
-      ,(t.assess_5_duration_sec/t.assess_5_user_num)/t.assess_5_pr_num as prog_watch_avg_dur_sec
+      ,round((t.assess_5_duration_sec/t.assess_5_user_num)/t.assess_5_pr_num, 2) as prog_watch_avg_dur_sec
   from (
         select p.program_id as business_id  
               ,count(distinct a.usernum_id) as assess_5_user_num  --使用用户数
@@ -436,36 +469,8 @@ select substr('${MONTH_START_DAY}', 1, 6) as statis_month
        ) t
 
 
-	   
---查询语句       
-select  a.statis_month
-       ,nvl(a.business_id, b.business_id) as business_id
-       ,a.use_user_cnt           --使用用户数
-       ,a.in_order_user_cnt      --在订付费用户数
-       ,a.use_in_order_user_rate --使用用户数与在订付费用户比例      
-       ,m.login_visit_user_cnt   --当月 剔重 注册访问用户数
-       ,m.visit_user_cnt         --当月 剔重 访问用户数         
-       ,case when c.all_check_3_num = 0 then 0 
-             else c.in_3_check_num/c.all_check_3_num  --前3名占比
-              end as propo_3_ip_use          
-       ,case when d.all_check_4_num =0 then 0
-             else d.in_4_check_num /d.all_check_4_num  --前3名占比  in_3_check_num
-              end as propo_3_ip_visit           
-       ,case when m.visit_user_cnt = 0 then 0
-             else b.day_avg_visit_user_cnt/m.visit_user_cnt --访问活跃度：日均访问用户数/月剔重访问用户数
-              end as activ_visit              
-       ,case when m.visit_user_cnt = 0 then 0
-             else 1-(m.login_visit_user_cnt/m.visit_user_cnt)
-              end as tourist_rate             -- 游客占比
-  from cdmpview.tmp_dy_05_Assess_2 a   
-  full join cdmpview.tmp_dy_05_Assess_3_d b
-    on a.business_id = b.business_id
-  full join cdmpview.tmp_dy_05_Assess_3_m m
-    on nvl(a.business_id, b.business_id) = m.business_id    
-  left join cdmpview.tmp_dy_05_check_3 c
-    on nvl(a.business_id, b.business_id) = c.business_id
-  left join cdmpview.tmp_dy_05_check_4 d
-    on nvl(a.business_id, b.business_id) = d.business_id 
+       
+ 
 
 
 ==================================================================================
