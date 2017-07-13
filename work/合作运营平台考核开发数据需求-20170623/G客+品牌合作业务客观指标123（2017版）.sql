@@ -435,7 +435,6 @@ select t.statis_month
 -- where m.src_file_month = '${SRC_FILE_MONTH}';
 
  
-
 --${OUTPUT_RESULT}
 --select  nvl(a1.statis_month,a2.statis_month) as statis_month
 --       ,nvl(a1.business_id, a2.business_id) as business_id
@@ -461,7 +460,6 @@ select t.statis_month
 --  left join cdmpview.qspt_hzyykh_17_check_4 c4
 --    on nvl(a1.business_id, a2.business_id) = c4.business_id and c4.src_file_month = '${SRC_FILE_MONTH}'
 -- where a1.src_file_month = '${SRC_FILE_MONTH}';
- 
  
 ${OUTPUT_RESULT} 
 select a.statis_month
