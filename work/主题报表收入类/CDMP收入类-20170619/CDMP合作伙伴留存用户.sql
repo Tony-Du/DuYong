@@ -127,7 +127,16 @@ grouping sets (
    
 
 
-  
    
+
+
+   
+--from rptdata.fact_order_daily_snapshot a  
+--left join rptdata.dim_server h
+--on (case when a.sub_business_id = '-998' then concat('', rand()) else a.sub_business_id end) = h.sub_busi_id
+假设表 a 的 sub_business_id 的值为‘-998’的有9000w条，为正常值的只有1条，
+如果不加任何处理，那么join的时候，为‘-998’的数据将会集中在一个分区(节点)处理，数据倾斜
+如果为其附上一个 rand() 随机数，为‘-998’的数据将会被分散到不同分区(节点)处理，hive(MR)优化  
+spark 中不能用   
    
    

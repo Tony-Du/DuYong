@@ -7,7 +7,7 @@ select a.business_id
  group by a.business_id
          ,a.sub_busi_id 
 )
-insert overwrite table cdmpview.qspt_hzyykh_17_check_1_2 partition (src_file_month = '${SRC_FILE_MONTH}')
+insert overwrite table qushupingtai.qspt_hzyykh_17_check_1_2 partition (src_file_month = '${SRC_FILE_MONTH}')
 select substr('${MONTH_START_DAY}', 1, 6) statis_month
       ,b.business_id
       ,fud.usernum_id
@@ -33,7 +33,7 @@ select a.business_id
  group by a.business_id
          ,a.sub_busi_id 
 )
-insert overwrite table cdmpview.qspt_hzyykh_17_check_3 partition (src_file_month = '${SRC_FILE_MONTH}')
+insert overwrite table qushupingtai.qspt_hzyykh_17_check_3 partition (src_file_month = '${SRC_FILE_MONTH}')
 select substr('${MONTH_START_DAY}',1,6) as statis_month
       ,a.business_id
       ,sum(case when a.rn <= 3 then a.check_3_u_num else 0 end) as in_3_check_num 
@@ -84,7 +84,7 @@ select a.business_id
  group by a.business_id
          ,a.sub_busi_id 
 )
-insert overwrite table cdmpview.qspt_hzyykh_17_check_4 partition (src_file_month = '${SRC_FILE_MONTH}')
+insert overwrite table qushupingtai.qspt_hzyykh_17_check_4 partition (src_file_month = '${SRC_FILE_MONTH}')
 select substr('${MONTH_START_DAY}',1,6) as statis_month
       ,a.business_id
       ,sum(case when a.rn <= 3 then a.check_4_num else 0 end) as in_3_check_num 
@@ -134,7 +134,7 @@ select a.business_id
  group by a.business_id
          ,a.sub_busi_id 
 )
-insert overwrite table cdmpview.qspt_hzyykh_17_assess_1 partition (src_file_month = '${SRC_FILE_MONTH}')
+insert overwrite table qushupingtai.qspt_hzyykh_17_assess_1 partition (src_file_month = '${SRC_FILE_MONTH}')
 select substr('${MONTH_END_DAY}', 1, 6) as statis_month
       ,t.business_id
       ,sum(t.accu_add_revenue) as accu_add_revenue
@@ -153,12 +153,12 @@ select substr('${MONTH_END_DAY}', 1, 6) as statis_month
          union all 
          
         select ar.business_id
-              ,ar.accu_add_revenue
-          from cdmpview.qspt_hzyykh_201704_05_add_revenue ar
+              ,ar.add_revenue as accu_add_revenue     
+          from qushupingtai.qspt_hzyykh_201704_05_add_revenue ar  
           join (select distinct business_id from ${DIM_BUSI_ID_TBL}) b
             on ar.business_id = b.business_id
          group by ar.business_id
-                 ,ar.accu_add_revenue
+                 ,ar.add_revenue
        ) t
  group by t.business_id;
  
@@ -173,7 +173,7 @@ select a.business_id
  group by a.business_id
          ,a.sub_busi_id 
 )
-insert overwrite table cdmpview.qspt_hzyykh_17_assess_2_u partition (src_file_month = '${SRC_FILE_MONTH}')
+insert overwrite table qushupingtai.qspt_hzyykh_17_assess_2_u partition (src_file_month = '${SRC_FILE_MONTH}')
 select substr('${MONTH_START_DAY}', 1, 6) as statis_month
       ,a.business_id
       ,count(a.usernum_id) as use_user_cnt 
@@ -199,7 +199,7 @@ select substr('${MONTH_START_DAY}', 1, 6) as statis_month
                  ,b.business_id
                  ,fud.usernum_id         
        ) a
-  join cdmpview.qspt_hzyykh_17_check_1_2 b
+  join qushupingtai.qspt_hzyykh_17_check_1_2 b
     on a.usernum_id = b.usernum_id and a.business_id = b.business_id and b.src_file_month = '${SRC_FILE_MONTH}'
  where a.dept = '合作运营部' 
    and b.flow_kb >= ${FLOW_THRESHOLD_KB}
@@ -217,7 +217,7 @@ select a.business_id
  group by a.business_id
          ,a.sub_busi_id 
 )
-insert overwrite table cdmpview.qspt_hzyykh_17_assess_2_order partition (src_file_month = '${SRC_FILE_MONTH}')      
+insert overwrite table qushupingtai.qspt_hzyykh_17_assess_2_order partition (src_file_month = '${SRC_FILE_MONTH}')      
 select substr('${MONTH_END_DAY}', 1, 6) as statis_month
       ,t.business_id 
       ,count(t.order_user_id) as in_order_user_cnt
@@ -238,7 +238,7 @@ select substr('${MONTH_END_DAY}', 1, 6) as statis_month
 
 
  
-insert overwrite TABLE cdmpview.qspt_hzyykh_17_assess_2 partition (src_file_month = '${SRC_FILE_MONTH}')
+insert overwrite TABLE qushupingtai.qspt_hzyykh_17_assess_2 partition (src_file_month = '${SRC_FILE_MONTH}')
 select t.statis_month
       ,t.business_id
       ,sum(t.use_user_cnt) as use_user_cnt
@@ -249,7 +249,7 @@ select t.statis_month
               ,u.business_id
               ,u.use_user_cnt
               ,0 as in_order_user_cnt
-          from cdmpview.qspt_hzyykh_17_assess_2_u u 
+          from qushupingtai.qspt_hzyykh_17_assess_2_u u 
          where u.src_file_month = '${SRC_FILE_MONTH}'
          
          union all 
@@ -258,7 +258,7 @@ select t.statis_month
               ,o.business_id
               ,0 as use_user_cnt
               ,o.in_order_user_cnt
-          from cdmpview.qspt_hzyykh_17_assess_2_order o
+          from qushupingtai.qspt_hzyykh_17_assess_2_order o
          where o.src_file_month = '${SRC_FILE_MONTH}' 
        ) t  
 group by t.statis_month, t.business_id
@@ -309,7 +309,7 @@ select case when tp.term_prod_name in ('和视频OPENAPI', '和视频SDK') then 
          ,fuvh.user_key
          ,fuvh.user_type_id
 )
-insert overwrite table cdmpview.qspt_hzyykh_17_assess_3_d partition (src_file_month = '${SRC_FILE_MONTH}')
+insert overwrite table qushupingtai.qspt_hzyykh_17_assess_3_d partition (src_file_month = '${SRC_FILE_MONTH}')
 select substr('${MONTH_START_DAY}', 1, 6) as statis_month
       ,t.business_id 
       ,sum(t.visit_user_cnt)/cast(substr('${MONTH_END_DAY}',7,2) as int) as day_avg_visit_user_cnt 
@@ -361,7 +361,7 @@ select case when tp.term_prod_name in ('和视频OPENAPI', '和视频SDK') then 
          ,fuvh.user_key
          ,fuvh.user_type_id
 )
-insert overwrite table cdmpview.qspt_hzyykh_17_assess_3_m partition (src_file_month = '${SRC_FILE_MONTH}')
+insert overwrite table qushupingtai.qspt_hzyykh_17_assess_3_m partition (src_file_month = '${SRC_FILE_MONTH}')
 select substr('${MONTH_START_DAY}', 1, 6) as statis_month
       ,t.business_id
       ,sum(t.login_visit_user_cnt) as login_visit_user_cnt 
@@ -388,7 +388,7 @@ select substr('${MONTH_START_DAY}', 1, 6) as statis_month
  
  
  
-insert overwrite TABLE cdmpview.qspt_hzyykh_17_assess_3 partition (src_file_month = '${SRC_FILE_MONTH}')
+insert overwrite TABLE qushupingtai.qspt_hzyykh_17_assess_3 partition (src_file_month = '${SRC_FILE_MONTH}')
 select t.statis_month
       ,t.business_id
       ,sum(t.day_avg_visit_user_cnt) as day_avg_visit_user_cnt
@@ -404,7 +404,7 @@ select t.statis_month
               ,d.day_avg_visit_user_cnt
               ,0 as login_visit_user_cnt
               ,0 as visit_user_cnt
-          from cdmpview.qspt_hzyykh_17_assess_3_d d
+          from qushupingtai.qspt_hzyykh_17_assess_3_d d
          where d.src_file_month = '${SRC_FILE_MONTH}'
 
          union all 
@@ -414,53 +414,51 @@ select t.statis_month
               ,0 as day_avg_visit_user_cnt
               ,m.login_visit_user_cnt
               ,m.visit_user_cnt
-          from cdmpview.qspt_hzyykh_17_assess_3_m m 
+          from qushupingtai.qspt_hzyykh_17_assess_3_m m 
          where m.src_file_month = '${SRC_FILE_MONTH}'
        ) t
  group by t.statis_month, t.business_id
 
 
---select nvl(d.statis_month, m.statis_month) as statis_month
---      ,nvl(d.business_id, m.business_id) as business_id
---      ,nvl(d.day_avg_visit_user_cnt, 0) as day_avg_visit_user_cnt
---      ,nvl(m.login_visit_user_cnt, 0) as login_visit_user_cnt   
---      ,nvl(m.visit_user_cnt, 0) as visit_user_cnt
---      ,case when nvl(m.visit_user_cnt, 0) = 0 then 0 
---            else nvl(d.day_avg_visit_user_cnt, 0)/m.visit_user_cnt end as activ_visit 
---      ,case when nvl(m.visit_user_cnt, 0) = 0 then 0 
---            else 1 - (nvl(m.login_visit_user_cnt, 0)/m.visit_user_cnt) end as tourist_rate 
---  from cdmpview.qspt_hzyykh_17_assess_3_d d
---  full join cdmpview.qspt_hzyykh_17_assess_3_m m 
---    on (d.business_id = m.business_id and d.src_file_month = '${SRC_FILE_MONTH}')
--- where m.src_file_month = '${SRC_FILE_MONTH}';
+ 
+insert overwrite table qushupingtai.qspt_hzyykh_17_assess_4 partition (src_file_month = '${SRC_FILE_MONTH}')
+select substr('${MONTH_START_DAY}', 1, 6) as statis_month
+      ,t.business_id
+      ,(t.assess_4_cnt/t.assess_4_user_num)/t.assess_4_pr_num as prog_watch_avg_cnt 
+  from (
+        select p.business_id   
+              ,count(distinct a.usernum_id) as assess_4_user_num  
+              ,count(1) as assess_4_cnt                  
+              ,count(distinct p.program_id) assess_4_pr_num 
+          from rptdata.fact_use_detail a
+          join ${GK_PROG_ID_TBL} p
+            on a.program_id = p.program_id
+         where a.src_file_day >= '${MONTH_START_DAY}' 
+           and a.src_file_day <= '${MONTH_END_DAY}'
+         group by p.business_id 
+       ) t;
 
- 
---${OUTPUT_RESULT}
---select  nvl(a1.statis_month,a2.statis_month) as statis_month
---       ,nvl(a1.business_id, a2.business_id) as business_id
---       ,nvl(a1.accu_add_revenue, 0) as accu_add_revenue
---       ,nvl(a2.use_user_cnt, 0) as use_user_cnt
---       ,nvl(a2.in_order_user_cnt, 0) as in_order_user_cnt
---       ,nvl(a2.use_in_order_user_rate, 0) as use_in_order_user_rate 
---       ,nvl(a3.activ_visit, 0) as activ_visit   
---       ,nvl(a3.tourist_rate, 0) as tourist_rate                     
---       ,case when c3.all_check_3_num = 0 then 0 
---             else c3.in_3_check_num/c3.all_check_3_num  
---              end as propo_3_ip_use                                 
---       ,case when c4.all_check_4_num = 0 then 0
---             else c4.in_3_check_num /c4.all_check_4_num  
---              end as propo_3_ip_visit 
---  from cdmpview.qspt_hzyykh_17_assess_1 a1
---  full join cdmpview.qspt_hzyykh_17_assess_2 a2
---    on a1.business_id = a2.business_id and a2.src_file_month = '${SRC_FILE_MONTH}'
---  full join cdmpview.qspt_hzyykh_17_assess_3 a3
---    on nvl(a1.business_id, a2.business_id) = a3.business_id and a3.src_file_month = '${SRC_FILE_MONTH}'
---  left join cdmpview.qspt_hzyykh_17_check_3 c3
---    on nvl(a1.business_id, a2.business_id) = c3.business_id and c3.src_file_month = '${SRC_FILE_MONTH}'
---  left join cdmpview.qspt_hzyykh_17_check_4 c4
---    on nvl(a1.business_id, a2.business_id) = c4.business_id and c4.src_file_month = '${SRC_FILE_MONTH}'
--- where a1.src_file_month = '${SRC_FILE_MONTH}';
- 
+
+       
+insert overwrite table qushupingtai.qspt_hzyykh_17_assess_5 partition (src_file_month = '${SRC_FILE_MONTH}')
+select substr('${MONTH_START_DAY}', 1, 6) as statis_month
+      ,t.business_id
+      ,(t.assess_5_duration_sec/t.assess_5_user_num)/t.assess_5_pr_num as prog_watch_avg_dur_sec
+  from (
+        select p.business_id  
+              ,count(distinct a.usernum_id) as assess_5_user_num 
+              ,sum(a.duration_sec) as assess_5_duration_sec 
+              ,count(distinct p.program_id) as assess_5_pr_num 
+          from rptdata.fact_use_detail a
+          join ${GK_PROG_ID_TBL} p
+            on a.program_id = p.program_id
+         where a.src_file_day >= '${MONTH_START_DAY}' 
+           and a.src_file_day <= '${MONTH_END_DAY}'
+         group by p.business_id 
+       ) t;
+
+
+       
 ${OUTPUT_RESULT} 
 select a.statis_month
       ,a.business_id
@@ -470,6 +468,8 @@ select a.statis_month
       ,a.use_in_order_user_rate
       ,a.activ_visit
       ,a.tourist_rate
+      ,a.prog_watch_avg_cnt
+      ,a.prog_watch_avg_dur_sec
       ,case when nvl(c3.all_check_3_num, 0) = 0 then 0 
             else nvl(c3.in_3_check_num, 0)/c3.all_check_3_num  
              end as propo_3_ip_use                                 
@@ -484,7 +484,9 @@ select a.statis_month
               ,sum(t.in_order_user_cnt) as in_order_user_cnt
               ,sum(t.use_in_order_user_rate) as use_in_order_user_rate
               ,sum(t.activ_visit) as activ_visit
-              ,sum(t.tourist_rate) as tourist_rate 
+              ,sum(t.tourist_rate) as tourist_rate
+              ,sum(t.prog_watch_avg_cnt) as prog_watch_avg_cnt
+              ,sum(t.prog_watch_avg_dur_sec) as prog_watch_avg_dur_sec              
           from ( 
                 select a1.statis_month
                       ,a1.business_id
@@ -493,8 +495,10 @@ select a.statis_month
                       ,0 as in_order_user_cnt
                       ,0 as use_in_order_user_rate
                       ,0 as activ_visit
-                      ,0 as tourist_rate 
-                  from cdmpview.qspt_hzyykh_17_assess_1 a1
+                      ,0 as tourist_rate
+                      ,0 as prog_watch_avg_cnt
+                      ,0 as prog_watch_avg_dur_sec                      
+                  from qushupingtai.qspt_hzyykh_17_assess_1 a1
                  where a1.src_file_month = '${SRC_FILE_MONTH}'
                  
                  union all
@@ -507,7 +511,9 @@ select a.statis_month
                       ,a2.use_in_order_user_rate
                       ,0 as activ_visit
                       ,0 as tourist_rate 
-                  from cdmpview.qspt_hzyykh_17_assess_2 a2
+                      ,0 as prog_watch_avg_cnt
+                      ,0 as prog_watch_avg_dur_sec
+                  from qushupingtai.qspt_hzyykh_17_assess_2 a2
                  where a2.src_file_month = '${SRC_FILE_MONTH}'
                  
                  union all
@@ -519,14 +525,47 @@ select a.statis_month
                       ,0 as in_order_user_cnt
                       ,0 as use_in_order_user_rate
                       ,a3.activ_visit
-                      ,a3.tourist_rate 
-                  from cdmpview.qspt_hzyykh_17_assess_3 a3
+                      ,a3.tourist_rate
+                      ,0 as prog_watch_avg_cnt
+                      ,0 as prog_watch_avg_dur_sec                      
+                  from qushupingtai.qspt_hzyykh_17_assess_3 a3
                  where a3.src_file_month = '${SRC_FILE_MONTH}'
+                 
+                 union all
+                 
+                select a4.statis_month
+                      ,a4.business_id
+                      ,0 as accu_add_revenue
+                      ,0 as use_user_cnt
+                      ,0 as in_order_user_cnt
+                      ,0 as use_in_order_user_rate
+                      ,0 as activ_visit
+                      ,0 as tourist_rate                      
+                      ,a4.prog_watch_avg_cnt
+                      ,0 as prog_watch_avg_dur_sec 
+                  from qushupingtai.qspt_hzyykh_17_assess_4 a4
+                 where a4.src_file_month = '${SRC_FILE_MONTH}'  
+                  
+                 union all
+                 
+                select a5.statis_month
+                      ,a5.business_id
+                      ,0 as accu_add_revenue
+                      ,0 as use_user_cnt
+                      ,0 as in_order_user_cnt
+                      ,0 as use_in_order_user_rate
+                      ,0 as activ_visit
+                      ,0 as tourist_rate                                 
+                      ,0 as prog_watch_avg_cnt
+                      ,a5.prog_watch_avg_dur_sec 
+                  from qushupingtai.qspt_hzyykh_17_assess_5 a5
+                 where a5.src_file_month = '${SRC_FILE_MONTH}' 
+                 
               ) t 
         group by t.statis_month, t.business_id 
        ) a            
-  left join cdmpview.qspt_hzyykh_17_check_3 c3
+  left join qushupingtai.qspt_hzyykh_17_check_3 c3
     on a.business_id = c3.business_id and c3.src_file_month = '${SRC_FILE_MONTH}'
-  left join cdmpview.qspt_hzyykh_17_check_4 c4
-    on a.business_id = c4.business_id and c4.src_file_month = '${SRC_FILE_MONTH}'
+  left join qushupingtai.qspt_hzyykh_17_check_4 c4
+    on a.business_id = c4.business_id and c4.src_file_month = '${SRC_FILE_MONTH}';
  

@@ -115,14 +115,14 @@ select statis_day
               ,concat_ws('_', '日', '自建CDN', '流量') as metric_name
               ,flow_kb as metric_value
           from flow_stat
-         where cdn_id in ('1000', '2000')
+         where cdn_id in ('1000', '2000', '4002')  --增加4002 20170724
 
          union all 
 
         select src_file_day as statis_day
               ,'流量日报' as metric_cat_name
               ,concat_ws('_', '日', '咪咕视频', '流量') as metric_name
-              ,flow_kb as metric_value
+              ,flow_kb as metric_value 
           from flow_stat
          where term_video_type_id = 'TV00303'
 

@@ -17,5 +17,5 @@ location 'hdfs上的目录';   --同上
 
 --alter table cdmpview.tmp_dy_05_assess_1_add_revenue add partition (src_file_month = '201705');
 
-insert overwrite table cdmpview.tmp_dy_05_assess_1_add_revenue partition (src_file_month = '201705')
+insert overwrite table qushupingtai.qspt_hzyykh_201704_05_add_revenue partition (src_file_month = '201705')
 select * from accu_add_revenue_May;
