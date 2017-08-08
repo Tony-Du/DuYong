@@ -1,3 +1,4 @@
+
 with tmp_new_add_order_user as( --当月新增
 select a.sub_business_id
       ,a.order_msisdn_region_id
@@ -6,7 +7,7 @@ select a.sub_business_id
       ,a.order_user_id
   from rptdata.fact_order_item_detail a 
  where a.order_status in (5,9) 
-   and substr(a.src_file_day, 1, 6) = '${EXTRACT_MONTH}'  
+   and substr(a.src_file_day, 1, 6) = '${EXTRACT_MONTH}' 
 ),
 tmp_this_mon_in_order_user as(  --当月最后一天在订
 select a.sub_business_id

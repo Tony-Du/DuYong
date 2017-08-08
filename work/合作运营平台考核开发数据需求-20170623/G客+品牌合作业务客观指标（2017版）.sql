@@ -146,8 +146,8 @@ select substr('${MONTH_END_DAY}', 1, 6) as statis_month
             on a.sub_business_id = b.sub_busi_id
          where a.src_file_day >= '20170601' and a.src_file_day <= '${MONTH_END_DAY}' 
            and a.order_status in (5,9)
-           and a.boss_repeat_order_flag <> 'Y'
-           and a.boss_last_success_bill_flag <> 'N'
+           and nvl(a.boss_repeat_order_flag,'') <> 'Y'
+           and nvl(a.boss_last_success_bill_flag,'') <> 'N'
          group by b.business_id
          
          union all 
