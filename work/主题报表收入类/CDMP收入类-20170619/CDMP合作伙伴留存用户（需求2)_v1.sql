@@ -74,7 +74,7 @@ select  substr('${EXTRACT_START_DAY}',1,6) as statis_start_month                
               ,d1.order_user_id as one_day_retention_user_id     
           from tmp_new_add_order_user a          
           left join tmp_one_day_in_order_user d1 
-            on a.order_user_id = d1.order_user_id
+            on a.order_user_id = d1.order_user_id 
           left join rptdata.dim_server h
             on (case when a.sub_business_id = '-998' then concat('', rand()) else a.sub_business_id end) = h.sub_busi_id
           left join rptdata.dim_region i

@@ -33,7 +33,7 @@ select a.sub_business_id
       ,a.channel_id
       ,a.order_user_id
   from rptdata.fact_order_daily_snapshot a 
- where translate(last_day(concat_ws('-', substr('${EXTRACT_MONTH}', 1, 4), substr('${EXTRACT_MONTH}', 5, 2), '01')), '-', '') >= '201706'
+ where translate(last_day(concat_ws('-', substr('${EXTRACT_MONTH}', 1, 4), substr('${EXTRACT_MONTH}', 5, 2), '01')), '-', '') >= '20170601'
    and a.snapshot_day = translate(last_day(concat_ws('-', substr('${EXTRACT_MONTH}', 1, 4), substr('${EXTRACT_MONTH}', 5, 2), '01')), '-', '')
  
  union all
@@ -46,7 +46,7 @@ select a.sub_busi_id as sub_business_id
   from cdmp_dw.td_aaa_order_d a 
   join rptdata.dim_userid_usernum b
     on a.serv_number = b.user_num
- where translate(last_day(concat_ws('-', substr('${EXTRACT_MONTH}', 1, 4), substr('${EXTRACT_MONTH}', 5, 2), '01')), '-', '') <= '201705'
+ where translate(last_day(concat_ws('-', substr('${EXTRACT_MONTH}', 1, 4), substr('${EXTRACT_MONTH}', 5, 2), '01')), '-', '') <= '20170531'
    and a.src_source_day = translate(last_day(concat_ws('-', substr('${EXTRACT_MONTH}', 1, 4), substr('${EXTRACT_MONTH}', 5, 2), '01')), '-', '')
 ),
 tmp_second_mon_in_order_user as(  --次月最后一天在订
@@ -56,7 +56,7 @@ select a.sub_business_id
       ,a.channel_id
       ,a.order_user_id
   from rptdata.fact_order_daily_snapshot a 
- where translate(last_day(add_months(concat_ws('-', substr('${EXTRACT_MONTH}', 1, 4), substr('${EXTRACT_MONTH}', 5, 2), '01'),1)), '-', '') >= '201706'
+ where translate(last_day(add_months(concat_ws('-', substr('${EXTRACT_MONTH}', 1, 4), substr('${EXTRACT_MONTH}', 5, 2), '01'),1)), '-', '') >= '20170601'
    and a.snapshot_day = translate(last_day(add_months(concat_ws('-', substr('${EXTRACT_MONTH}', 1, 4), substr('${EXTRACT_MONTH}', 5, 2), '01'),1)), '-', '')
  
  union all
@@ -69,7 +69,7 @@ select a.sub_busi_id as sub_business_id
   from cdmp_dw.td_aaa_order_d a 
   join rptdata.dim_userid_usernum b
     on a.serv_number = b.user_num
- where translate(last_day(add_months(concat_ws('-', substr('${EXTRACT_MONTH}', 1, 4), substr('${EXTRACT_MONTH}', 5, 2), '01'),1)), '-', '') <= '201705'
+ where translate(last_day(add_months(concat_ws('-', substr('${EXTRACT_MONTH}', 1, 4), substr('${EXTRACT_MONTH}', 5, 2), '01'),1)), '-', '') <= '20170531'
    and a.src_source_day = translate(last_day(add_months(concat_ws('-', substr('${EXTRACT_MONTH}', 1, 4), substr('${EXTRACT_MONTH}', 5, 2), '01'),1)), '-', '')
 ),  
 
@@ -80,7 +80,7 @@ select a.sub_business_id
       ,a.channel_id
       ,a.order_user_id
   from rptdata.fact_order_daily_snapshot a 
- where translate(last_day(add_months(concat_ws('-', substr('${EXTRACT_MONTH}', 1, 4), substr('${EXTRACT_MONTH}', 5, 2), '01'),2)), '-', '') >= '201706'
+ where translate(last_day(add_months(concat_ws('-', substr('${EXTRACT_MONTH}', 1, 4), substr('${EXTRACT_MONTH}', 5, 2), '01'),2)), '-', '') >= '20170601'
    and a.snapshot_day = translate(last_day(add_months(concat_ws('-', substr('${EXTRACT_MONTH}', 1, 4), substr('${EXTRACT_MONTH}', 5, 2), '01'),2)), '-', '')
  
  union all
@@ -93,7 +93,7 @@ select a.sub_busi_id as sub_business_id
   from cdmp_dw.td_aaa_order_d a 
   join rptdata.dim_userid_usernum b
     on a.serv_number = b.user_num
- where translate(last_day(add_months(concat_ws('-', substr('${EXTRACT_MONTH}', 1, 4), substr('${EXTRACT_MONTH}', 5, 2), '01'),2)), '-', '') <= '201705'
+ where translate(last_day(add_months(concat_ws('-', substr('${EXTRACT_MONTH}', 1, 4), substr('${EXTRACT_MONTH}', 5, 2), '01'),2)), '-', '') <= '20170531'
    and a.src_source_day = translate(last_day(add_months(concat_ws('-', substr('${EXTRACT_MONTH}', 1, 4), substr('${EXTRACT_MONTH}', 5, 2), '01'),2)), '-', '') 
 ), 
 
@@ -104,7 +104,7 @@ select a.sub_business_id
       ,a.channel_id
       ,a.order_user_id
   from rptdata.fact_order_daily_snapshot a 
- where translate(last_day(add_months(concat_ws('-', substr('${EXTRACT_MONTH}', 1, 4), substr('${EXTRACT_MONTH}', 5, 2), '01'),3)), '-', '') >= '201706'
+ where translate(last_day(add_months(concat_ws('-', substr('${EXTRACT_MONTH}', 1, 4), substr('${EXTRACT_MONTH}', 5, 2), '01'),3)), '-', '') >= '20170601'
    and a.snapshot_day = translate(last_day(add_months(concat_ws('-', substr('${EXTRACT_MONTH}', 1, 4), substr('${EXTRACT_MONTH}', 5, 2), '01'),3)), '-', '')
  
  union all
@@ -117,7 +117,7 @@ select a.sub_busi_id as sub_business_id
   from cdmp_dw.td_aaa_order_d a 
   join rptdata.dim_userid_usernum b
     on a.serv_number = b.user_num
- where translate(last_day(add_months(concat_ws('-', substr('${EXTRACT_MONTH}', 1, 4), substr('${EXTRACT_MONTH}', 5, 2), '01'),3)), '-', '') <= '201705'
+ where translate(last_day(add_months(concat_ws('-', substr('${EXTRACT_MONTH}', 1, 4), substr('${EXTRACT_MONTH}', 5, 2), '01'),3)), '-', '') <= '20170531'
    and a.src_source_day = translate(last_day(add_months(concat_ws('-', substr('${EXTRACT_MONTH}', 1, 4), substr('${EXTRACT_MONTH}', 5, 2), '01'),3)), '-', '') 
 ),  
 tmp_after_4_mon_in_order_user as(  --4个月最后一天在订
@@ -127,7 +127,7 @@ select a.sub_business_id
       ,a.channel_id
       ,a.order_user_id
   from rptdata.fact_order_daily_snapshot a 
- where translate(last_day(add_months(concat_ws('-', substr('${EXTRACT_MONTH}', 1, 4), substr('${EXTRACT_MONTH}', 5, 2), '01'),4)), '-', '') >= '201706'
+ where translate(last_day(add_months(concat_ws('-', substr('${EXTRACT_MONTH}', 1, 4), substr('${EXTRACT_MONTH}', 5, 2), '01'),4)), '-', '') >= '20170601'
    and a.snapshot_day = translate(last_day(add_months(concat_ws('-', substr('${EXTRACT_MONTH}', 1, 4), substr('${EXTRACT_MONTH}', 5, 2), '01'),4)), '-', '')
  
  union all
@@ -140,7 +140,7 @@ select a.sub_busi_id as sub_business_id
   from cdmp_dw.td_aaa_order_d a 
   join rptdata.dim_userid_usernum b
     on a.serv_number = b.user_num
- where translate(last_day(add_months(concat_ws('-', substr('${EXTRACT_MONTH}', 1, 4), substr('${EXTRACT_MONTH}', 5, 2), '01'),4)), '-', '') <= '201705'
+ where translate(last_day(add_months(concat_ws('-', substr('${EXTRACT_MONTH}', 1, 4), substr('${EXTRACT_MONTH}', 5, 2), '01'),4)), '-', '') <= '20170531'
    and a.src_source_day = translate(last_day(add_months(concat_ws('-', substr('${EXTRACT_MONTH}', 1, 4), substr('${EXTRACT_MONTH}', 5, 2), '01'),4)), '-', '') 
 ),  
 tmp_after_5_mon_in_order_user as(  --5个月最后一天在订
@@ -150,7 +150,7 @@ select a.sub_business_id
       ,a.channel_id
       ,a.order_user_id
   from rptdata.fact_order_daily_snapshot a 
- where translate(last_day(add_months(concat_ws('-', substr('${EXTRACT_MONTH}', 1, 4), substr('${EXTRACT_MONTH}', 5, 2), '01'),5)), '-', '') >= '201706'
+ where translate(last_day(add_months(concat_ws('-', substr('${EXTRACT_MONTH}', 1, 4), substr('${EXTRACT_MONTH}', 5, 2), '01'),5)), '-', '') >= '20170601'
    and a.snapshot_day = translate(last_day(add_months(concat_ws('-', substr('${EXTRACT_MONTH}', 1, 4), substr('${EXTRACT_MONTH}', 5, 2), '01'),5)), '-', '')
  
  union all
@@ -163,7 +163,7 @@ select a.sub_busi_id as sub_business_id
   from cdmp_dw.td_aaa_order_d a 
   join rptdata.dim_userid_usernum b
     on a.serv_number = b.user_num
- where translate(last_day(add_months(concat_ws('-', substr('${EXTRACT_MONTH}', 1, 4), substr('${EXTRACT_MONTH}', 5, 2), '01'),5)), '-', '') <= '201705'
+ where translate(last_day(add_months(concat_ws('-', substr('${EXTRACT_MONTH}', 1, 4), substr('${EXTRACT_MONTH}', 5, 2), '01'),5)), '-', '') <= '20170531'
    and a.src_source_day = translate(last_day(add_months(concat_ws('-', substr('${EXTRACT_MONTH}', 1, 4), substr('${EXTRACT_MONTH}', 5, 2), '01'),5)), '-', '') 
 ), 
 tmp_after_6_mon_in_order_user as(  --6个月最后一天在订
@@ -173,7 +173,7 @@ select a.sub_business_id
       ,a.channel_id
       ,a.order_user_id
   from rptdata.fact_order_daily_snapshot a 
- where translate(last_day(add_months(concat_ws('-', substr('${EXTRACT_MONTH}', 1, 4), substr('${EXTRACT_MONTH}', 5, 2), '01'),6)), '-', '') >= '201706'
+ where translate(last_day(add_months(concat_ws('-', substr('${EXTRACT_MONTH}', 1, 4), substr('${EXTRACT_MONTH}', 5, 2), '01'),6)), '-', '') >= '20170601'
    and a.snapshot_day = translate(last_day(add_months(concat_ws('-', substr('${EXTRACT_MONTH}', 1, 4), substr('${EXTRACT_MONTH}', 5, 2), '01'),6)), '-', '')
  
  union all
@@ -186,7 +186,7 @@ select a.sub_busi_id as sub_business_id
   from cdmp_dw.td_aaa_order_d a 
   join rptdata.dim_userid_usernum b
     on a.serv_number = b.user_num
- where translate(last_day(add_months(concat_ws('-', substr('${EXTRACT_MONTH}', 1, 4), substr('${EXTRACT_MONTH}', 5, 2), '01'),6)), '-', '') <= '201705'
+ where translate(last_day(add_months(concat_ws('-', substr('${EXTRACT_MONTH}', 1, 4), substr('${EXTRACT_MONTH}', 5, 2), '01'),6)), '-', '') <= '20170531'
    and a.src_source_day = translate(last_day(add_months(concat_ws('-', substr('${EXTRACT_MONTH}', 1, 4), substr('${EXTRACT_MONTH}', 5, 2), '01'),6)), '-', '') 
 ) 
 select '${EXTRACT_MONTH}' as statis_month                  --新增订购月份

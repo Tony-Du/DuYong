@@ -175,14 +175,18 @@ WHERE nvl(`p`.`sessionstart`, '{}') <> '{}' and `p`.`sessionstart` <> '[]'
 
 -- ############################################################################################################################################################################### --										
 										
-CREATE VIEW `ods.kesheng_sdk_json_v` AS select regexp_replace(`k2`.`line`[0], '\\\\n|\\\\r|\\\\u001f|\\\\u0000', '') `json`, `k2`.`line`[1] `client_ip`
+CREATE VIEW `ods.kesheng_sdk_json_v` AS 
+select regexp_replace(`k2`.`line`[0], '\\\\n|\\\\r|\\\\u001f|\\\\u0000', '') `json`
+      ,`k2`.`line`[1] `client_ip`
       ,`k2`.`src_file_day`
       ,`k2`.`src_file_hour`
       ,`k2`.`input_file_name` ,`k2`.`block_offset_inside_file`
       ,concat(`k2`.`input_file_name`,':',`k2`.`block_offset_inside_file`) `rowkey`
   from (select split(`k1`.`line`,'\\|\\|') `line`
-              ,`k1`.`src_file_day` ,`k1`.`src_file_hour`
-              ,`k1`.`input__file__name` `input_file_name`  ,`k1`.`block__offset__inside__file` `block_offset_inside_file`
+              ,`k1`.`src_file_day` 
+              ,`k1`.`src_file_hour`
+              ,`k1`.`input__file__name` `input_file_name` 
+              ,`k1`.`block__offset__inside__file` `block_offset_inside_file`
           from `ods`.`kesheng_sdk_raw_ex` `k1`
        ) `k2`
 	   
