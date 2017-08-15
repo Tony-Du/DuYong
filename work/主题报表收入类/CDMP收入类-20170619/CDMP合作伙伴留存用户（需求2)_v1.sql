@@ -9,7 +9,7 @@ select a.sub_business_id
  where a.src_file_day >= '20170601'   
    and a.src_file_day between '${EXTRACT_START_DAY}' and '${EXTRACT_END_DAY}'  
    and a.order_status in (5,9) 
-   
+  
  union all 
 
 select a.sub_busi_id as sub_business_id
@@ -48,6 +48,8 @@ select a.sub_busi_id as sub_business_id
  where '${RETENTION_DAY}' <= '20170531'
    and a.src_source_day = '${RETENTION_DAY}' 
 )
+
+
 select  substr('${EXTRACT_START_DAY}',1,6) as statis_start_month                  --新增订购周期的第一个月份
        ,substr('${EXTRACT_END_DAY}',1,6) as statis_end_month                      --新增订购周期的最后一个月份
        ,nvl(business_type, '剔重汇总') as business_type
