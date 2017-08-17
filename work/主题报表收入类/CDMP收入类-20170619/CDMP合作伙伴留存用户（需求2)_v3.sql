@@ -59,7 +59,7 @@ select a.region_id as order_msisdn_region_id
    
 ),
 
-tmp_one_day_in_order_user as(  --某一天在订
+tmp_one_day_in_order_user as(       --某一天在订
 
 select a.order_msisdn_region_id
       ,a.payment_msisdn_region_id           
@@ -89,9 +89,9 @@ select a.region_id as order_msisdn_region_id
       ,a.sub_busi_id as sub_business_id
       
       ,a.new_product_id as product_id
-      ,null as order_crt_time            --在源表中没有 不确定是不是 opr_time
-      ,null as order_program_id          --这个真没有
-      ,null as order_opr_user_id         --在源表中没有 不确定是不是 opr_login
+      ,null as order_crt_time              --在源表中没有 不确定是不是 opr_time
+      ,null as order_program_id            --这个真没有
+      ,null as order_opr_user_id           --在源表中没有 不确定是不是 opr_login
       ,b.user_id as order_user_id          
   from cdmp_dw.td_aaa_order_d a 
   join rptdata.dim_userid_usernum b

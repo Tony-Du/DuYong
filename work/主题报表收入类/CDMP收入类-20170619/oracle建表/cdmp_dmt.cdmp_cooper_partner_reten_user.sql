@@ -1,7 +1,6 @@
-
 create table cdmp_cooper_partner_reten_user 
 (
-    src_file_month                 char(6),
+    src_file_month                 varchar2(20),
     business_type                  varchar2(128),                            
     business_name                  varchar2(128),                    
     sub_business_name              varchar2(128),                        

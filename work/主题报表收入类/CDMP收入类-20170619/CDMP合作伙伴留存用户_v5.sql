@@ -266,7 +266,6 @@ grouping sets (
 (business_type, business_name, sub_business_name, channel_id, chn_name, chn_attr_1_name, chn_attr_2_name, phone_province_name))
 ),
 
-
 tmp_after_2_mon_in_order_user as(    
 select nvl(business_type, '剔重汇总') as business_type
       ,nvl(business_name, '剔重汇总') as business_name
@@ -365,7 +364,6 @@ grouping sets (
 (business_type, business_name, sub_business_name, channel_id, chn_name, chn_attr_1_name, chn_attr_2_name),
 (business_type, business_name, sub_business_name, channel_id, chn_name, chn_attr_1_name, chn_attr_2_name, phone_province_name))
 ),
-
 
 tmp_after_3_mon_in_order_user as(    
 select nvl(business_type, '剔重汇总') as business_type
@@ -763,7 +761,6 @@ grouping sets (
 (business_type, business_name, sub_business_name, channel_id, chn_name, chn_attr_1_name, chn_attr_2_name, phone_province_name))
 )
 
-
 select business_type                             
       ,business_name                      
       ,sub_business_name                         
@@ -951,4 +948,4 @@ group by business_type
         ,channel_id                                                       
         ,chn_name                                
         ,chn_attr_1_name                  
-        ,chn_attr_2_name 
+        ,chn_attr_2_name
