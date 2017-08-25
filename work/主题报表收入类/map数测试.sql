@@ -59,5 +59,37 @@ select a.sub_busi_id as sub_business_id
            1            1          671852597 /user/hive/warehouse/cdmp_dw.db/td_aaa_order_log_d/src_source_day=20160129     
            1            1          641053858 /user/hive/warehouse/cdmp_dw.db/td_aaa_order_log_d/src_source_day=20160130     
            1            1          694297711 /user/hive/warehouse/cdmp_dw.db/td_aaa_order_log_d/src_source_day=20160131     
-           
+
+oru@ddp-dn-047:~> hadoop fs -du -h /user/hive/warehouse/cdmp_dw.db/td_aaa_order_log_d/src_source_day=201601*;
+1.0 G  3.0 G  /user/hive/warehouse/cdmp_dw.db/td_aaa_order_log_d/src_source_day=20160101/part-m-00000
+1.3 G  3.9 G  /user/hive/warehouse/cdmp_dw.db/td_aaa_order_log_d/src_source_day=20160102/part-m-00000
+1.2 G  3.6 G  /user/hive/warehouse/cdmp_dw.db/td_aaa_order_log_d/src_source_day=20160103/part-m-00000
+1.2 G  3.5 G  /user/hive/warehouse/cdmp_dw.db/td_aaa_order_log_d/src_source_day=20160104/part-m-00000
+1.2 G  3.7 G  /user/hive/warehouse/cdmp_dw.db/td_aaa_order_log_d/src_source_day=20160105/part-m-00000
+1.1 G  3.2 G  /user/hive/warehouse/cdmp_dw.db/td_aaa_order_log_d/src_source_day=20160106/part-m-00000
+1.0 G  3.1 G  /user/hive/warehouse/cdmp_dw.db/td_aaa_order_log_d/src_source_day=20160107/part-m-00000
+1.0 G  3.1 G  /user/hive/warehouse/cdmp_dw.db/td_aaa_order_log_d/src_source_day=20160108/part-m-00000
+886.1 M  2.6 G  /user/hive/warehouse/cdmp_dw.db/td_aaa_order_log_d/src_source_day=20160109/part-m-00000
+1.1 G  3.3 G  /user/hive/warehouse/cdmp_dw.db/td_aaa_order_log_d/src_source_day=20160110/part-m-00000
+843.4 M  2.5 G  /user/hive/warehouse/cdmp_dw.db/td_aaa_order_log_d/src_source_day=20160111/part-m-00000
+730.5 M  2.1 G  /user/hive/warehouse/cdmp_dw.db/td_aaa_order_log_d/src_source_day=20160112/part-m-00000
+698.8 M  2.0 G  /user/hive/warehouse/cdmp_dw.db/td_aaa_order_log_d/src_source_day=20160113/part-m-00000
+727.5 M  2.1 G  /user/hive/warehouse/cdmp_dw.db/td_aaa_order_log_d/src_source_day=20160114/part-m-00000
+700.2 M  2.1 G  /user/hive/warehouse/cdmp_dw.db/td_aaa_order_log_d/src_source_day=20160115/part-m-00000
+722.7 M  2.1 G  /user/hive/warehouse/cdmp_dw.db/td_aaa_order_log_d/src_source_day=20160116/part-m-00000
+692.2 M  2.0 G  /user/hive/warehouse/cdmp_dw.db/td_aaa_order_log_d/src_source_day=20160117/part-m-00000
+647.4 M  1.9 G  /user/hive/warehouse/cdmp_dw.db/td_aaa_order_log_d/src_source_day=20160118/part-m-00000
+631.1 M  1.8 G  /user/hive/warehouse/cdmp_dw.db/td_aaa_order_log_d/src_source_day=20160119/part-m-00000
+695.6 M  2.0 G  /user/hive/warehouse/cdmp_dw.db/td_aaa_order_log_d/src_source_day=20160120/part-m-00000
+656.2 M  1.9 G  /user/hive/warehouse/cdmp_dw.db/td_aaa_order_log_d/src_source_day=20160121/part-m-00000
+609.0 M  1.8 G  /user/hive/warehouse/cdmp_dw.db/td_aaa_order_log_d/src_source_day=20160122/part-m-00000
+566.3 M  1.7 G  /user/hive/warehouse/cdmp_dw.db/td_aaa_order_log_d/src_source_day=20160123/part-m-00000
+591.8 M  1.7 G  /user/hive/warehouse/cdmp_dw.db/td_aaa_order_log_d/src_source_day=20160124/part-m-00000
+619.3 M  1.8 G  /user/hive/warehouse/cdmp_dw.db/td_aaa_order_log_d/src_source_day=20160125/part-m-00000
+622.9 M  1.8 G  /user/hive/warehouse/cdmp_dw.db/td_aaa_order_log_d/src_source_day=20160126/part-m-00000
+664.1 M  1.9 G  /user/hive/warehouse/cdmp_dw.db/td_aaa_order_log_d/src_source_day=20160127/part-m-00000
+683.2 M  2.0 G  /user/hive/warehouse/cdmp_dw.db/td_aaa_order_log_d/src_source_day=20160128/part-m-00000
+640.7 M  1.9 G  /user/hive/warehouse/cdmp_dw.db/td_aaa_order_log_d/src_source_day=20160129/part-m-00000
+611.4 M  1.8 G  /user/hive/warehouse/cdmp_dw.db/td_aaa_order_log_d/src_source_day=20160130/part-m-00000
+662.1 M  1.9 G  /user/hive/warehouse/cdmp_dw.db/td_aaa_order_log_d/src_source_day=20160131/part-m-00000           
            

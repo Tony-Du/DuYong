@@ -46,7 +46,7 @@ select nvl(i.prov_name,'NA') as phone_province_name
     on (case when a.region_id = '-998' then concat('',rand()) else a.region_id end) = i.region_id
  where a.src_source_day <= '20170531'
    and a.src_source_day between '${EXTRACT_START_DAY}' and '${EXTRACT_END_DAY}'
-   and a.order_type = 1     
+   and a.order_type = 1 
    --相关维度的限定
    and i.prov_name in ${PROVINCE_NAME}
    and a.serv_number in ${PHONE_NUM}

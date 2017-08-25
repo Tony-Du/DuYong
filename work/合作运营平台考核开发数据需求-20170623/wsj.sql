@@ -906,3 +906,36 @@ select  bb.program_id business_id,
 CREATE TABLE cdmpview.tmp_wsj_05_Assess_5 AS
 select a.business_id,(a.assess_5_duration_sec/a.assess_5_num)/a.assess_5_pr_num
 from cdmpview.tmp_wsj_05_Assess_5_detail a;
+
+
+
+
+
+
+    4/5月的新增收入用cdmp的（附件中给到4/5月份各业务全量的累计新增）
+CREATE TABLE  cdmpview.tmp_wsj_0704_feev2 PARALLEL 32 NOLOGGING AS
+SELECT v.statis_month,
+       v.business_id,
+       SUM(fee) Ass_1_fee
+FROM(  
+      SELECT a.statis_month,
+             a.business_id,
+             SUM(a.count_fee) fee
+      FROM cdmp_mk.tm_user_fee_m a
+      WHERE a.statis_month BETWEEN '201704' AND '201705'
+      GROUP BY a.statis_month,a.business_id
+      union ALL
+      SELECT substr(a.statis_day,1,6)statis_month,
+             a.business_id,
+             SUM(a.bill_fee)fee
+      FROM cdmp_mk.tm_month_fee_info_d a
+      WHERE a.statis_day BETWEEN '20170401'AND '20170531'
+      AND a.is_add='1'
+      GROUP BY substr(a.statis_day,1,6),a.business_id)v
+GROUP BY v.statis_month,v.business_id;
+
+
+
+
+
+

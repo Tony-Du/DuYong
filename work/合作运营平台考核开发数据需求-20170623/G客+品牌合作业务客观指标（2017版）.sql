@@ -256,8 +256,8 @@ select t.statis_month
          
         select o.statis_month
               ,o.business_id
-              ,0 as use_user_cnt
-              ,o.in_order_user_cnt
+              ,0 as use_user_cnt 
+              ,o.in_order_user_cnt 
           from qushupingtai.qspt_hzyykh_17_assess_2_order o
          where o.src_file_month = '${SRC_FILE_MONTH}' 
        ) t  
