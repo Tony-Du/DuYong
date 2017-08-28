@@ -38,9 +38,9 @@ select a.sub_busi_id as sub_business_id
       ,a.chn_id_new as channel_id
       ,b.user_id as order_user_id
   from cdmp_dw.td_aaa_order_log_d a 
-  join rptdata.dim_userid_usernum b
+  join rptdata.dim_userid_usernum b 
     on a.serv_number = b.user_num
- where '${EXTRACT_MONTH}' <=  '201705'
+ where '${EXTRACT_MONTH}' <=  '201705' 
    and a.order_type = 1          --新增 flag
    and a.src_source_day between '${EXTRACT_MONTH}01' and '${EXTRACT_MONTH}31'      
 ),
@@ -62,8 +62,8 @@ select a.sub_business_id
 select a.sub_busi_id as sub_business_id
       ,a.region_id as order_msisdn_region_id
       ,a.region_id as payment_msisdn_region_id
-      ,a.chn_id_new as channel_id
-      ,b.user_id as order_user_id
+      ,a.chn_id_new as channel_id 
+      ,b.user_id as order_user_id 
   from cdmp_dw.td_aaa_order_log_d a 
   join rptdata.dim_userid_usernum b
     on a.serv_number = b.user_num
@@ -245,6 +245,10 @@ select a.sub_busi_id as sub_business_id
    and a.src_source_day between translate(add_months(concat_ws('-', substr('${EXTRACT_MONTH}', 1, 4), substr('${EXTRACT_MONTH}', 5, 2), '01'),6), '-', '') 
                         and translate(last_day(add_months(concat_ws('-', substr('${EXTRACT_MONTH}', 1, 4), substr('${EXTRACT_MONTH}', 5, 2), '01'),6)), '-', '')
 )
+
+
+
+
 
 
 
