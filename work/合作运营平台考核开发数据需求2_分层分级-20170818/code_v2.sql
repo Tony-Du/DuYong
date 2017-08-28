@@ -130,26 +130,26 @@ select b.company_id
   
 --使用用户数/在订用户数   
 insert overwrite TABLE qushupingtai.qspt_hzyykh_fcfj_use_in_order_user_rate partition (src_file_month = '${SRC_FILE_MONTH}') 
-select company_id
-      ,sum(use_user_cnt) as use_user_cnt
-      ,sum(in_order_user_cnt) as in_order_user_cnt
-      ,case when in_order_user_cnt = 0 then 0 else sum(use_user_cnt)/sum(in_order_user_cnt) end as use_in_order_user_rate
+select t.company_id
+      ,sum(t.use_user_cnt) as use_user_cnt
+      ,sum(t.in_order_user_cnt) as in_order_user_cnt
+      ,case when sum(t.in_order_user_cnt) = 0 then 0 else sum(t.use_user_cnt)/sum(t.in_order_user_cnt) end as use_in_order_user_rate
   from (  
-        select company_id
-              ,use_user_cnt
+        select a.company_id
+              ,a.use_user_cnt
               ,0 as in_order_user_cnt
           from qushupingtai.qspt_hzyykh_fcfj_in_order_user a 
          where a.src_file_month = '${SRC_FILE_MONTH}'
           
          union all
          
-        select company_id
+        select a.company_id
               ,0 as use_user_cnt
-              ,in_order_user_cnt
+              ,a.in_order_user_cnt
           from qushupingtai.qspt_hzyykh_fcfj_in_order_user a 
          where a.src_file_month = '${SRC_FILE_MONTH}'  
        ) t 
- group by company_id;
+ group by t.company_id;
 
  
 
