@@ -1,22 +1,4 @@
 
-
---退订用户数	统计周期内，成功退续订业务的用户数。维度：部门、业务、终端、省份、地市、渠道、付费渠道、货币类型、是否虚拟局数据、订购周期、订购周期单位、是否自动续订	
-
---count(distinct order_user_id) where src_file_day between xxx and order_status in (12,14,15,16)	
-
---rptdata.fact_order_item_detail
-
---新增订购用户数	统计周期内，成功订购业务的用户数。维度：部门、业务、终端、省份、地市、渠道、付费渠道、货币类型、是否虚拟局数据、订购周期、订购周期单位、是否自动续订
-
---count(distinct order_user_id) where src_file_day between xxx and order_status in (5,9)	
-
---rptdata.fact_order_item_detail
-
---5月31日之前新增/退订的用户订单
---cdmp_dw.td_aaa_order_log_d order_type = 1新增 order_type = 2退订
-
-
-
 with new_add_order_user as( --当月新增
 select order_crt_time    
       ,sub_business_id
@@ -92,14 +74,14 @@ select order_cancel_time
            and a.order_type = 2                 --退订 flag
            and a.src_source_day between '${EXTRACT_MONTH}01' and '${EXTRACT_MONTH}31'   
        ) t 
- group by order_crt_time    
+ group by order_cancel_time    
          ,sub_business_id
          ,order_msisdn_region_id
          ,payment_msisdn_region_id
          ,channel_id
          ,order_user_id           
-)
-insert overwrite table stg.fact_this_mon_retention_user    --当月留存用户记录
+),
+this_mon_retention_user as (   --当月留存用户记录
 select a.sub_business_id
       ,a.order_msisdn_region_id
       ,a.payment_msisdn_region_id
@@ -112,15 +94,13 @@ select a.sub_business_id
         and a.payment_msisdn_region_id = b.payment_msisdn_region_id
         and a.channel_id = b.channel_id
         and a.order_user_id = b.order_user_id)
- where a.order_crt_time < b.order_cancel_time
-   and b.order_user_id is null
+ where b.order_user_id is null
  group by a.sub_business_id
          ,a.order_msisdn_region_id
          ,a.payment_msisdn_region_id
          ,a.channel_id
-         ,a.order_user_id;
-
-=============================================================================================================
+         ,a.order_user_id
+),
 
 second_mon_cancel_order_user as (   --次月退订
 select sub_business_id
@@ -160,18 +140,14 @@ select sub_business_id
          ,payment_msisdn_region_id
          ,channel_id
          ,order_user_id     
-)
-
---translate(last_day(add_months(concat_ws('-', substr('${EXTRACT_MONTH}', 1, 4), substr('${EXTRACT_MONTH}', 5, 2), '01'),1)), '-', '')   --次月最后一天
---translate(add_months(concat_ws('-', substr('${EXTRACT_MONTH}', 1, 4), substr('${EXTRACT_MONTH}', 5, 2), '01'),1), '-', '')  --次月第一天
-
-insert overwrite table stg.fact_second_mon_retention_user    --次月留存用户记录
+),
+second_mon_retention_user as (   --次月留存用户记录
 select a.sub_business_id
       ,a.order_msisdn_region_id
       ,a.payment_msisdn_region_id
       ,a.channel_id
       ,a.order_user_id 
-  from stg.fact_this_mon_retention_user a
+  from this_mon_retention_user a
   left join second_mon_cancel_order_user b
     on (a.sub_business_id = b.sub_business_id
         and a.order_msisdn_region_id = b.order_msisdn_region_id 
@@ -183,9 +159,8 @@ select a.sub_business_id
          ,a.order_msisdn_region_id
          ,a.payment_msisdn_region_id
          ,a.channel_id
-         ,a.order_user_id;
-
-==================================================================================================================
+         ,a.order_user_id
+),
 
 after_2_mon_cancel_order_user as (   --2个月后退订
 select sub_business_id
@@ -225,14 +200,14 @@ select sub_business_id
          ,payment_msisdn_region_id
          ,channel_id
          ,order_user_id
-)
-insert overwrite table stg.fact_after_2_mon_retention_user   --2个月后留存用户记录
+),
+after_2_mon_retention_user as (  --2个月后留存用户记录
 select a.sub_business_id
       ,a.order_msisdn_region_id
       ,a.payment_msisdn_region_id
       ,a.channel_id
       ,a.order_user_id 
-  from stg.fact_second_mon_retention_user a 
+  from second_mon_retention_user a 
   left join after_2_mon_cancel_order_user b
     on (a.sub_business_id = b.sub_business_id
         and a.order_msisdn_region_id = b.order_msisdn_region_id 
@@ -244,9 +219,8 @@ select a.sub_business_id
          ,a.order_msisdn_region_id
          ,a.payment_msisdn_region_id
          ,a.channel_id
-         ,a.order_user_id;
-
-=====================================================================================================================================
+         ,a.order_user_id
+),
 
 after_3_mon_cancel_order_user as (   --3个月后退订
 select sub_business_id
@@ -286,14 +260,14 @@ select sub_business_id
          ,payment_msisdn_region_id
          ,channel_id
          ,order_user_id
-)
-insert overwrite table stg.fact_after_3_mon_retention_user    --3个月后留存用户记录
+),
+after_3_mon_retention_user as (   --3个月后留存用户记录
 select a.sub_business_id
       ,a.order_msisdn_region_id
       ,a.payment_msisdn_region_id
       ,a.channel_id
       ,a.order_user_id 
-  from stg.fact_after_2_mon_cancel_order_user a 
+  from after_2_mon_retention_user a 
   left join after_3_mon_cancel_order_user b
     on (a.sub_business_id = b.sub_business_id
         and a.order_msisdn_region_id = b.order_msisdn_region_id 
@@ -305,9 +279,8 @@ select a.sub_business_id
          ,a.order_msisdn_region_id
          ,a.payment_msisdn_region_id
          ,a.channel_id
-         ,a.order_user_id;
-
-=====================================================================================================================================
+         ,a.order_user_id
+),
 
 after_4_mon_cancel_order_user as (   --4个月后退订
 select sub_business_id
@@ -347,14 +320,14 @@ select sub_business_id
          ,payment_msisdn_region_id
          ,channel_id
          ,order_user_id
-)
-insert overwrite table stg.fact_after_4_mon_retention_user    --4个月后留存用户记录
+),
+after_4_mon_retention_user as (   --4个月后留存用户记录
 select a.sub_business_id
       ,a.order_msisdn_region_id
       ,a.payment_msisdn_region_id
       ,a.channel_id
       ,a.order_user_id 
-  from stg.fact_after_3_mon_cancel_order_user a 
+  from after_3_mon_retention_user a 
   left join after_4_mon_cancel_order_user b
     on (a.sub_business_id = b.sub_business_id
         and a.order_msisdn_region_id = b.order_msisdn_region_id 
@@ -366,10 +339,8 @@ select a.sub_business_id
          ,a.order_msisdn_region_id
          ,a.payment_msisdn_region_id
          ,a.channel_id
-         ,a.order_user_id;
-
-=====================================================================================================================================
-
+         ,a.order_user_id
+),
 after_5_mon_cancel_order_user as (   --5个月后退订
 select sub_business_id
       ,order_msisdn_region_id
@@ -408,14 +379,14 @@ select sub_business_id
          ,payment_msisdn_region_id
          ,channel_id
          ,order_user_id                                                               
-)
-insert overwrite table stg.fact_after_5_mon_retention_user    --5个月后留存用户记录
+),
+after_5_mon_retention_user as (    --5个月后留存用户记录
 select a.sub_business_id
       ,a.order_msisdn_region_id
       ,a.payment_msisdn_region_id
       ,a.channel_id
       ,a.order_user_id 
-  from stg.fact_after_4_mon_cancel_order_user a 
+  from after_4_mon_retention_user a 
   left join after_5_mon_cancel_order_user b
     on (a.sub_business_id = b.sub_business_id
         and a.order_msisdn_region_id = b.order_msisdn_region_id 
@@ -427,10 +398,8 @@ select a.sub_business_id
          ,a.order_msisdn_region_id
          ,a.payment_msisdn_region_id
          ,a.channel_id
-         ,a.order_user_id;
-
-=====================================================================================================================================
-
+         ,a.order_user_id
+),
 after_6_mon_cancel_order_user as (   --6个月后退订
 select sub_business_id
       ,order_msisdn_region_id
@@ -469,14 +438,14 @@ select sub_business_id
          ,payment_msisdn_region_id
          ,channel_id
          ,order_user_id     
-)
-insert overwrite table stg.fact_after_6_mon_retention_user    --6个月后留存用户记录
+),
+after_6_mon_retention_user as (    --6个月后留存用户记录
 select a.sub_business_id
       ,a.order_msisdn_region_id
       ,a.payment_msisdn_region_id
       ,a.channel_id
       ,a.order_user_id 
-  from stg.fact_after_5_mon_cancel_order_user a 
+  from after_5_mon_retention_user a 
   left join after_6_mon_cancel_order_user b
     on (a.sub_business_id = b.sub_business_id
         and a.order_msisdn_region_id = b.order_msisdn_region_id 
@@ -488,141 +457,273 @@ select a.sub_business_id
          ,a.order_msisdn_region_id
          ,a.payment_msisdn_region_id
          ,a.channel_id
-         ,a.order_user_id;
-
-
-
-         
-select t.sub_business_id
-      ,t.order_msisdn_region_id
-      ,t.payment_msisdn_region_id
-      ,t.channel_id
+         ,a.order_user_id
+) 
+select '${EXTRACT_MONTH}' as statis_month                  --新增订购月份
+      ,nvl(business_type_name, '剔重汇总') as business_type_name
+      ,nvl(business_name, '剔重汇总') as business_name
+      ,nvl(sub_business_name, '剔重汇总') as sub_business_name
+      ,nvl(phone_province_name, '剔重汇总') as phone_province_name
+      ,nvl(channel_id, '剔重汇总') as channel_id
+      ,nvl(chn_name, '剔重汇总') as chn_name
+      ,nvl(chn_attr_1_name, '剔重汇总') as chn_attr_1_name
+      ,nvl(chn_attr_2_name, '剔重汇总') as chn_attr_2_name
+      ,sum(new_add_order_user_cnt) as new_add_order_user_cnt
       ,sum(this_mon_retention_user_cnt) as this_mon_retention_user_cnt
       ,sum(second_mon_retention_user_cnt) as second_mon_retention_user_cnt
       ,sum(after_2_mon_retention_user_cnt) as after_2_mon_retention_user_cnt
       ,sum(after_3_mon_retention_user_cnt) as after_3_mon_retention_user_cnt
       ,sum(after_4_mon_retention_user_cnt) as after_4_mon_retention_user_cnt
       ,sum(after_5_mon_retention_user_cnt) as after_5_mon_retention_user_cnt
-      ,sum(after_6_mon_retention_user_cnt) as after_6_mon_retention_user_cnt     
-  from (         
-        select a.sub_business_id
-              ,a.order_msisdn_region_id
-              ,a.payment_msisdn_region_id
-              ,a.channel_id
+      ,sum(after_6_mon_retention_user_cnt) as after_6_mon_retention_user_cnt      
+  from (
+        select nvl(h.business_type_name, 'NA') as business_type_name                             
+              ,nvl(h.business_name, 'NA') as business_name                      
+              ,nvl(h.sub_busi_name, 'NA') as sub_business_name                         
+              ,nvl(i.prov_name, 'NA') as phone_province_name  
+              ,a.channel_id                                                       
+              ,nvl(g.chn_name, 'NA') as chn_name                                
+              ,nvl(g.chn_attr_1_name, 'NA') as chn_attr_1_name                  
+              ,nvl(g.chn_attr_2_name, 'NA') as chn_attr_2_name                  
+              ,count(a.order_user_id) as new_add_order_user_cnt   --新增订购用户数
+              ,0 as this_mon_retention_user_cnt
+              ,0 as second_mon_retention_user_cnt
+              ,0 as after_2_mon_retention_user_cnt
+              ,0 as after_3_mon_retention_user_cnt
+              ,0 as after_4_mon_retention_user_cnt
+              ,0 as after_5_mon_retention_user_cnt
+              ,0 as after_6_mon_retention_user_cnt 
+          from new_add_order_user a
+          left join rptdata.dim_sub_busi h
+            on (case when a.sub_business_id = '-998' then concat('', rand()) else a.sub_business_id end) = h.sub_busi_id
+          left join rptdata.dim_region i
+            on (case when a.order_msisdn_region_id = '-998' then (case when a.payment_msisdn_region_id = '-998' then concat('', rand()) else a.payment_msisdn_region_id end) else a.order_msisdn_region_id end) = i.region_id
+          left join rptdata.dim_chn g
+            on (case when a.channel_id = '-998' then concat('', rand()) else a.channel_id end) = g.chn_id 
+         group by nvl(h.business_type_name, 'NA')     
+                 ,nvl(h.business_name, 'NA')                    
+                 ,nvl(h.sub_busi_name, 'NA')                        
+                 ,nvl(i.prov_name, 'NA')  
+                 ,a.channel_id                                                       
+                 ,nvl(g.chn_name, 'NA')                           
+                 ,nvl(g.chn_attr_1_name, 'NA')               
+                 ,nvl(g.chn_attr_2_name, 'NA')
+                          
+         union all 
+
+        select nvl(h.business_type_name, 'NA') as business_type_name                             --业务类型
+              ,nvl(h.business_name, 'NA') as business_name                      --业务名称
+              ,nvl(h.sub_busi_name, 'NA') as sub_business_name                  --子业务名称       
+              ,nvl(i.prov_name, 'NA') as phone_province_name 
+              ,a.channel_id                                                     --渠道id      
+              ,nvl(g.chn_name, 'NA') as chn_name                                --渠道名称
+              ,nvl(g.chn_attr_1_name, 'NA') as chn_attr_1_name                  --渠道一级
+              ,nvl(g.chn_attr_2_name, 'NA') as chn_attr_2_name                  --渠道二级
+              ,0 as new_add_order_user_cnt
               ,count(a.order_user_id) as this_mon_retention_user_cnt
               ,0 as second_mon_retention_user_cnt
               ,0 as after_2_mon_retention_user_cnt
               ,0 as after_3_mon_retention_user_cnt
               ,0 as after_4_mon_retention_user_cnt
               ,0 as after_5_mon_retention_user_cnt
-              ,0 as after_6_mon_retention_user_cnt
-          from stg.fact_this_mon_retention_user a 
-         group by a.sub_business_id
-                 ,a.order_msisdn_region_id
-                 ,a.payment_msisdn_region_id
-                 ,a.channel_id
+              ,0 as after_6_mon_retention_user_cnt 
+          from this_mon_retention_user a
+          left join rptdata.dim_sub_busi h
+            on (case when a.sub_business_id = '-998' then concat('', rand()) else a.sub_business_id end) = h.sub_busi_id
+          left join rptdata.dim_region i
+            on (case when a.order_msisdn_region_id = '-998' then (case when a.payment_msisdn_region_id = '-998' then concat('', rand()) else a.payment_msisdn_region_id end) else a.order_msisdn_region_id end) = i.region_id
+          left join rptdata.dim_chn g
+            on (case when a.channel_id = '-998' then concat('', rand()) else a.channel_id end) = g.chn_id 
+         group by nvl(h.business_type_name, 'NA')     
+                 ,nvl(h.business_name, 'NA')                    
+                 ,nvl(h.sub_busi_name, 'NA')                        
+                 ,nvl(i.prov_name, 'NA')  
+                 ,a.channel_id                                                       
+                 ,nvl(g.chn_name, 'NA')                           
+                 ,nvl(g.chn_attr_1_name, 'NA')               
+                 ,nvl(g.chn_attr_2_name, 'NA')          
           
-         union all  
-                 
-        select a.sub_business_id
-              ,a.order_msisdn_region_id
-              ,a.payment_msisdn_region_id
-              ,a.channel_id
+         union all 
+
+        select nvl(h.business_type_name, 'NA') as business_type_name                             --业务类型
+              ,nvl(h.business_name, 'NA') as business_name                      --业务名称
+              ,nvl(h.sub_busi_name, 'NA') as sub_business_name                  --子业务名称       
+              ,nvl(i.prov_name, 'NA') as phone_province_name 
+              ,a.channel_id                                                     --渠道id      
+              ,nvl(g.chn_name, 'NA') as chn_name                                --渠道名称
+              ,nvl(g.chn_attr_1_name, 'NA') as chn_attr_1_name                  --渠道一级
+              ,nvl(g.chn_attr_2_name, 'NA') as chn_attr_2_name                  --渠道二级
+              ,0 as new_add_order_user_cnt
               ,0 as this_mon_retention_user_cnt
               ,count(a.order_user_id) as second_mon_retention_user_cnt
               ,0 as after_2_mon_retention_user_cnt
               ,0 as after_3_mon_retention_user_cnt
               ,0 as after_4_mon_retention_user_cnt
               ,0 as after_5_mon_retention_user_cnt
-              ,0 as after_6_mon_retention_user_cnt
-          from stg.fact_second_mon_retention_user a 
-         group by a.sub_business_id
-                 ,a.order_msisdn_region_id
-                 ,a.payment_msisdn_region_id
-                 ,a.channel_id
+              ,0 as after_6_mon_retention_user_cnt 
+          from second_mon_retention_user a
+          left join rptdata.dim_sub_busi h
+            on (case when a.sub_business_id = '-998' then concat('', rand()) else a.sub_business_id end) = h.sub_busi_id
+          left join rptdata.dim_region i
+            on (case when a.order_msisdn_region_id = '-998' then (case when a.payment_msisdn_region_id = '-998' then concat('', rand()) else a.payment_msisdn_region_id end) else a.order_msisdn_region_id end) = i.region_id
+          left join rptdata.dim_chn g
+            on (case when a.channel_id = '-998' then concat('', rand()) else a.channel_id end) = g.chn_id 
+         group by nvl(h.business_type_name, 'NA')     
+                 ,nvl(h.business_name, 'NA')                    
+                 ,nvl(h.sub_busi_name, 'NA')                        
+                 ,nvl(i.prov_name, 'NA')  
+                 ,a.channel_id                                                       
+                 ,nvl(g.chn_name, 'NA')                           
+                 ,nvl(g.chn_attr_1_name, 'NA')               
+                 ,nvl(g.chn_attr_2_name, 'NA')
 
-         union all  
-                 
-        select a.sub_business_id
-              ,a.order_msisdn_region_id
-              ,a.payment_msisdn_region_id
-              ,a.channel_id
+         union all 
+
+        select nvl(h.business_type_name, 'NA') as business_type_name                             --业务类型
+              ,nvl(h.business_name, 'NA') as business_name                      --业务名称
+              ,nvl(h.sub_busi_name, 'NA') as sub_business_name                  --子业务名称       
+              ,nvl(i.prov_name, 'NA') as phone_province_name 
+              ,a.channel_id                                                     --渠道id      
+              ,nvl(g.chn_name, 'NA') as chn_name                                --渠道名称
+              ,nvl(g.chn_attr_1_name, 'NA') as chn_attr_1_name                  --渠道一级
+              ,nvl(g.chn_attr_2_name, 'NA') as chn_attr_2_name                  --渠道二级
+              ,0 as new_add_order_user_cnt
               ,0 as this_mon_retention_user_cnt
               ,0 as second_mon_retention_user_cnt
               ,count(a.order_user_id) as after_2_mon_retention_user_cnt
               ,0 as after_3_mon_retention_user_cnt
               ,0 as after_4_mon_retention_user_cnt
               ,0 as after_5_mon_retention_user_cnt
-              ,0 as after_6_mon_retention_user_cnt
-          from stg.fact_after_2_mon_retention_user a  
-         group by a.sub_business_id
-                 ,a.order_msisdn_region_id
-                 ,a.payment_msisdn_region_id
-                 ,a.channel_id
-                 
-         union all
+              ,0 as after_6_mon_retention_user_cnt 
+          from after_2_mon_retention_user a
+          left join rptdata.dim_sub_busi h
+            on (case when a.sub_business_id = '-998' then concat('', rand()) else a.sub_business_id end) = h.sub_busi_id
+          left join rptdata.dim_region i
+            on (case when a.order_msisdn_region_id = '-998' then (case when a.payment_msisdn_region_id = '-998' then concat('', rand()) else a.payment_msisdn_region_id end) else a.order_msisdn_region_id end) = i.region_id
+          left join rptdata.dim_chn g
+            on (case when a.channel_id = '-998' then concat('', rand()) else a.channel_id end) = g.chn_id 
+         group by nvl(h.business_type_name, 'NA')     
+                 ,nvl(h.business_name, 'NA')                    
+                 ,nvl(h.sub_busi_name, 'NA')                        
+                 ,nvl(i.prov_name, 'NA')  
+                 ,a.channel_id                                                       
+                 ,nvl(g.chn_name, 'NA')                           
+                 ,nvl(g.chn_attr_1_name, 'NA')               
+                 ,nvl(g.chn_attr_2_name, 'NA')
 
-        select a.sub_business_id
-              ,a.order_msisdn_region_id
-              ,a.payment_msisdn_region_id
-              ,a.channel_id
+         union all 
+
+        select nvl(h.business_type_name, 'NA') as business_type_name                             --业务类型
+              ,nvl(h.business_name, 'NA') as business_name                      --业务名称
+              ,nvl(h.sub_busi_name, 'NA') as sub_business_name                  --子业务名称       
+              ,nvl(i.prov_name, 'NA') as phone_province_name 
+              ,a.channel_id                                                     --渠道id      
+              ,nvl(g.chn_name, 'NA') as chn_name                                --渠道名称
+              ,nvl(g.chn_attr_1_name, 'NA') as chn_attr_1_name                  --渠道一级
+              ,nvl(g.chn_attr_2_name, 'NA') as chn_attr_2_name                  --渠道二级
+              ,0 as new_add_order_user_cnt
               ,0 as this_mon_retention_user_cnt
               ,0 as second_mon_retention_user_cnt
               ,0 as after_2_mon_retention_user_cnt
               ,count(a.order_user_id) as after_3_mon_retention_user_cnt
               ,0 as after_4_mon_retention_user_cnt
               ,0 as after_5_mon_retention_user_cnt
-              ,0 as after_6_mon_retention_user_cnt
-          from stg.fact_after_3_mon_retention_user a 
-         group by a.sub_business_id
-                 ,a.order_msisdn_region_id
-                 ,a.payment_msisdn_region_id
-                 ,a.channel_id
+              ,0 as after_6_mon_retention_user_cnt 
+          from after_3_mon_retention_user a
+          left join rptdata.dim_sub_busi h
+            on (case when a.sub_business_id = '-998' then concat('', rand()) else a.sub_business_id end) = h.sub_busi_id
+          left join rptdata.dim_region i
+            on (case when a.order_msisdn_region_id = '-998' then (case when a.payment_msisdn_region_id = '-998' then concat('', rand()) else a.payment_msisdn_region_id end) else a.order_msisdn_region_id end) = i.region_id
+          left join rptdata.dim_chn g
+            on (case when a.channel_id = '-998' then concat('', rand()) else a.channel_id end) = g.chn_id 
+         group by nvl(h.business_type_name, 'NA')     
+                 ,nvl(h.business_name, 'NA')                    
+                 ,nvl(h.sub_busi_name, 'NA')                        
+                 ,nvl(i.prov_name, 'NA')  
+                 ,a.channel_id                                                       
+                 ,nvl(g.chn_name, 'NA')                           
+                 ,nvl(g.chn_attr_1_name, 'NA')               
+                 ,nvl(g.chn_attr_2_name, 'NA')
 
-         union all
+         union all 
 
-        select a.sub_business_id
-              ,a.order_msisdn_region_id
-              ,a.payment_msisdn_region_id
-              ,a.channel_id
+        select nvl(h.business_type_name, 'NA') as business_type_name                             --业务类型
+              ,nvl(h.business_name, 'NA') as business_name                      --业务名称
+              ,nvl(h.sub_busi_name, 'NA') as sub_business_name                  --子业务名称       
+              ,nvl(i.prov_name, 'NA') as phone_province_name 
+              ,a.channel_id                                                     --渠道id      
+              ,nvl(g.chn_name, 'NA') as chn_name                                --渠道名称
+              ,nvl(g.chn_attr_1_name, 'NA') as chn_attr_1_name                  --渠道一级
+              ,nvl(g.chn_attr_2_name, 'NA') as chn_attr_2_name                  --渠道二级
+              ,0 as new_add_order_user_cnt
               ,0 as this_mon_retention_user_cnt
               ,0 as second_mon_retention_user_cnt
               ,0 as after_2_mon_retention_user_cnt
               ,0 as after_3_mon_retention_user_cnt
               ,count(a.order_user_id) as after_4_mon_retention_user_cnt
               ,0 as after_5_mon_retention_user_cnt
-              ,0 as after_6_mon_retention_user_cnt
-          from stg.fact_after_4_mon_retention_user a 
-         group by a.sub_business_id
-                 ,a.order_msisdn_region_id
-                 ,a.payment_msisdn_region_id
-                 ,a.channel_id
-          
-         union all
+              ,0 as after_6_mon_retention_user_cnt 
+          from after_4_mon_retention_user a
+          left join rptdata.dim_sub_busi h
+            on (case when a.sub_business_id = '-998' then concat('', rand()) else a.sub_business_id end) = h.sub_busi_id
+          left join rptdata.dim_region i
+            on (case when a.order_msisdn_region_id = '-998' then (case when a.payment_msisdn_region_id = '-998' then concat('', rand()) else a.payment_msisdn_region_id end) else a.order_msisdn_region_id end) = i.region_id
+          left join rptdata.dim_chn g
+            on (case when a.channel_id = '-998' then concat('', rand()) else a.channel_id end) = g.chn_id 
+         group by nvl(h.business_type_name, 'NA')     
+                 ,nvl(h.business_name, 'NA')                    
+                 ,nvl(h.sub_busi_name, 'NA')                        
+                 ,nvl(i.prov_name, 'NA')  
+                 ,a.channel_id                                                       
+                 ,nvl(g.chn_name, 'NA')                           
+                 ,nvl(g.chn_attr_1_name, 'NA')               
+                 ,nvl(g.chn_attr_2_name, 'NA')
 
-        select a.sub_business_id
-              ,a.order_msisdn_region_id
-              ,a.payment_msisdn_region_id
-              ,a.channel_id
+         union all 
+
+        select nvl(h.business_type_name, 'NA') as business_type_name                             --业务类型
+              ,nvl(h.business_name, 'NA') as business_name                      --业务名称
+              ,nvl(h.sub_busi_name, 'NA') as sub_business_name                  --子业务名称       
+              ,nvl(i.prov_name, 'NA') as phone_province_name 
+              ,a.channel_id                                                     --渠道id      
+              ,nvl(g.chn_name, 'NA') as chn_name                                --渠道名称
+              ,nvl(g.chn_attr_1_name, 'NA') as chn_attr_1_name                  --渠道一级
+              ,nvl(g.chn_attr_2_name, 'NA') as chn_attr_2_name                  --渠道二级
+              ,0 as new_add_order_user_cnt
               ,0 as this_mon_retention_user_cnt
               ,0 as second_mon_retention_user_cnt
               ,0 as after_2_mon_retention_user_cnt
               ,0 as after_3_mon_retention_user_cnt
               ,0 as after_4_mon_retention_user_cnt
               ,count(a.order_user_id) as after_5_mon_retention_user_cnt
-              ,0 as after_6_mon_retention_user_cnt
-          from stg.fact_after_5_mon_retention_user a 
-         group by a.sub_business_id
-                 ,a.order_msisdn_region_id
-                 ,a.payment_msisdn_region_id
-                 ,a.channel_id
-                 
-         union all
+              ,0 as after_6_mon_retention_user_cnt 
+          from after_5_mon_retention_user a
+          left join rptdata.dim_sub_busi h
+            on (case when a.sub_business_id = '-998' then concat('', rand()) else a.sub_business_id end) = h.sub_busi_id
+          left join rptdata.dim_region i
+            on (case when a.order_msisdn_region_id = '-998' then (case when a.payment_msisdn_region_id = '-998' then concat('', rand()) else a.payment_msisdn_region_id end) else a.order_msisdn_region_id end) = i.region_id
+          left join rptdata.dim_chn g
+            on (case when a.channel_id = '-998' then concat('', rand()) else a.channel_id end) = g.chn_id 
+         group by nvl(h.business_type_name, 'NA')     
+                 ,nvl(h.business_name, 'NA')                    
+                 ,nvl(h.sub_busi_name, 'NA')                        
+                 ,nvl(i.prov_name, 'NA')  
+                 ,a.channel_id                                                       
+                 ,nvl(g.chn_name, 'NA')                           
+                 ,nvl(g.chn_attr_1_name, 'NA')               
+                 ,nvl(g.chn_attr_2_name, 'NA')
 
-        select a.sub_business_id
-              ,a.order_msisdn_region_id
-              ,a.payment_msisdn_region_id
-              ,a.channel_id
+         union all 
+
+        select nvl(h.business_type_name, 'NA') as business_type_name                             --业务类型
+              ,nvl(h.business_name, 'NA') as business_name                      --业务名称
+              ,nvl(h.sub_busi_name, 'NA') as sub_business_name                  --子业务名称       
+              ,nvl(i.prov_name, 'NA') as phone_province_name 
+              ,a.channel_id                                                     --渠道id      
+              ,nvl(g.chn_name, 'NA') as chn_name                                --渠道名称
+              ,nvl(g.chn_attr_1_name, 'NA') as chn_attr_1_name                  --渠道一级
+              ,nvl(g.chn_attr_2_name, 'NA') as chn_attr_2_name                  --渠道二级
+              ,0 as new_add_order_user_cnt 
               ,0 as this_mon_retention_user_cnt
               ,0 as second_mon_retention_user_cnt
               ,0 as after_2_mon_retention_user_cnt
@@ -630,13 +731,26 @@ select t.sub_business_id
               ,0 as after_4_mon_retention_user_cnt
               ,0 as after_5_mon_retention_user_cnt
               ,count(a.order_user_id) as after_6_mon_retention_user_cnt
-          from stg.fact_after_6_mon_retention_user a 
-         group by a.sub_business_id
-                 ,a.order_msisdn_region_id
-                 ,a.payment_msisdn_region_id
-                 ,a.channel_id
+          from after_6_mon_retention_user a
+          left join rptdata.dim_sub_busi h
+            on (case when a.sub_business_id = '-998' then concat('', rand()) else a.sub_business_id end) = h.sub_busi_id
+          left join rptdata.dim_region i
+            on (case when a.order_msisdn_region_id = '-998' then (case when a.payment_msisdn_region_id = '-998' then concat('', rand()) else a.payment_msisdn_region_id end) else a.order_msisdn_region_id end) = i.region_id
+          left join rptdata.dim_chn g
+            on (case when a.channel_id = '-998' then concat('', rand()) else a.channel_id end) = g.chn_id 
+         group by nvl(h.business_type_name, 'NA')     
+                 ,nvl(h.business_name, 'NA')                    
+                 ,nvl(h.sub_busi_name, 'NA')                        
+                 ,nvl(i.prov_name, 'NA')  
+                 ,a.channel_id                                                       
+                 ,nvl(g.chn_name, 'NA')                           
+                 ,nvl(g.chn_attr_1_name, 'NA')               
+                 ,nvl(g.chn_attr_2_name, 'NA')            
        ) t
- group by t.sub_business_id
-         ,t.order_msisdn_region_id
-         ,t.payment_msisdn_region_id
-         ,t.channel_id
+ group by business_type_name,business_name,sub_business_name,channel_id
+         ,chn_name,chn_attr_1_name,chn_attr_2_name,phone_province_name   
+grouping sets (
+(business_type_name, business_name, sub_business_name, channel_id, chn_name, chn_attr_1_name, chn_attr_2_name),
+(business_type_name, business_name, sub_business_name, channel_id, chn_name, chn_attr_1_name, chn_attr_2_name, phone_province_name)
+);                  
+

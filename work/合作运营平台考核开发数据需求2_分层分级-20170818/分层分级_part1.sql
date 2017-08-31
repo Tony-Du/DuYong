@@ -19,10 +19,10 @@ select b.company_id
          union all
 
         select a.sub_busi_id 
-              ,a.add_revenue as accu_add_revenue
+              ,sum(a.add_revenue) as accu_add_revenue
           from qushupingtai.qspt_hzyykh_fcfj_201704_05_add_revenue a
          where a.statis_month between '201704' and '201705'
-         group by a.sub_busi_id, a.add_revenue 
+         group by a.sub_busi_id 
        ) t
    join temp_dim_fcfj_tbl b                     
      on t.sub_busi_id = b.sub_busi_id
@@ -70,57 +70,60 @@ select tt.company_id
  group by tt.company_id ;
  
 
-  
+---在订付费用户记录 有修改  
 with temp_dim_fcfj_tbl as (  
 select company_id, business_id, sub_busi_id              
   from ${DIM_FCFJ_TBL} a 
  group by company_id, business_id, sub_busi_id   
 ),
 temp_in_order_user_tbl as (
-
-select a.sub_business_id as sub_busi_id
+select b.company_id
       ,a.order_user_id
   from rptdata.fact_order_daily_snapshot a
   join rptdata.dim_charge_product c
-    on a.product_id = c.chrgprod_id   
+    on a.product_id = c.chrgprod_id  
+  join temp_dim_fcfj_tbl b  
+    on c.sub_busi_bdid = b.sub_busi_id    
  where '${MONTH_START_DAY}' >= '20170601' 
    and a.snapshot_day = '${MONTH_END_DAY}'  
    and c.chrgprod_price > 0   
- group by a.sub_business_id, a.order_user_id  
+ group by b.company_id, a.order_user_id  
 
  union all
  
-select c.sub_busi_bdid as sub_busi_id
+select b.company_id
       ,a.usernum as order_user_id    
   from intdata.ugc_90104_monthorder a   
   join rptdata.dim_charge_product c
     on a.product_id = c.chrgprod_id
+  join temp_dim_fcfj_tbl b  
+    on c.sub_busi_bdid = b.sub_busi_id  
  where '${MONTH_START_DAY}' >= '20170501'
    and '${MONTH_END_DAY}' <= '20170531' 
    and a.src_file_day = '${MONTH_END_DAY}'
    and c.chrgprod_price >0
- group by c.sub_busi_bdid, a.usernum
+ group by b.company_id, a.usernum
 
  union all
  
-select c.sub_busi_bdid as sub_busi_id
+select b.company_id
       ,a.usernum as order_user_id
   from intdata.ugc_90104_monthorder_union a 
   join rptdata.dim_charge_product c
     on a.product_id = c.chrgprod_id
+  join temp_dim_fcfj_tbl b  
+    on c.sub_busi_bdid = b.sub_busi_id 
  where '${MONTH_START_DAY}' >= '20170401'
    and '${MONTH_END_DAY}' <= '20170430' 
    and a.src_file_day = '${MONTH_END_DAY}'
    and c.chrgprod_price >0  
- group by c.sub_busi_bdid, a.usernum 
+ group by b.company_id, a.usernum 
 )
 insert overwrite table qushupingtai.qspt_hzyykh_fcfj_in_order_user partition (src_file_month = '${SRC_FILE_MONTH}') 
-select b.company_id
+select t.company_id
       ,count(t.order_user_id) as in_order_user_cnt
-  from temp_in_order_user_tbl t 
-  join temp_dim_fcfj_tbl b  
-    on t.sub_busi_id = b.sub_busi_id   
- group by b.company_id ;  
+  from temp_in_order_user_tbl t   
+ group by t.company_id ;  
   
 
  

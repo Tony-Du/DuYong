@@ -1,4 +1,45 @@
 
+select count(*) cnt
+  from (
+        select a.sub_business_id
+              ,a.order_msisdn_region_id
+              ,a.payment_msisdn_region_id
+              ,a.channel_id
+              ,a.order_user_id
+          from rptdata.fact_order_item_detail a 
+         where '201707' >=  '201706'
+           and a.order_status in (5,9)   --新增 flag
+           and a.src_file_day between '20170701' and '20170731'
+       ) t 
++----------+--+
+|   cnt    |
++----------+--+
+| 8281662  |
++----------+--+
+
+
+
+select count(*) cnt
+  from (
+        select a.sub_business_id
+              ,a.order_msisdn_region_id
+              ,a.payment_msisdn_region_id
+              ,a.channel_id
+              ,a.order_user_id
+          from rptdata.fact_order_item_detail a 
+         where '201706' >=  '201706'
+           and a.order_status in (5,9)   --新增 flag
+           and a.src_file_day between '20170601' and '20170631'
+       ) t 
++-----------+--+
+|    cnt    |
++-----------+--+
+| 13638251  |
++-----------+--+
+
+
+----------------------------------------------------
+
 
 select count(*) cnt
   from (
@@ -39,48 +80,9 @@ select count(*) cnt
 | 8169386  |
 +----------+--+
 
-
---------------------------------
-
-select count(*) cnt
-  from (
-        select a.sub_business_id
-              ,a.order_msisdn_region_id
-              ,a.payment_msisdn_region_id
-              ,a.channel_id
-              ,a.order_user_id
-          from rptdata.fact_order_item_detail a 
-         where '201707' >=  '201706'
-           and a.order_status in (5,9)   --新增 flag
-           and a.src_file_day between '20170701' and '20170731'
-       ) t 
-+----------+--+
-|   cnt    |
-+----------+--+
-| 8281662  |
-+----------+--+
-
-
-
-select count(*) cnt
-  from (
-        select a.sub_business_id
-              ,a.order_msisdn_region_id
-              ,a.payment_msisdn_region_id
-              ,a.channel_id
-              ,a.order_user_id
-          from rptdata.fact_order_item_detail a 
-         where '201706' >=  '201706'
-           and a.order_status in (5,9)   --新增 flag
-           and a.src_file_day between '20170601' and '20170631'
-       ) t 
-+-----------+--+
-|    cnt    |
-+-----------+--+
-| 13638251  |
-+-----------+--+
        
 ================================================================================================================================================================
+
 
 select count(*) cnt
   from (

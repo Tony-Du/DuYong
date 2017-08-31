@@ -1,4 +1,4 @@
-﻿------------------=========================
+﻿------------------=========================使用用户的记录
 --Assess_1
 --Assess_2
 DROP table IF EXISTS cdmpview.tmp_wsj_0814_class_05_2_u_de ;    
@@ -27,7 +27,8 @@ CREATE TABLE cdmpview.tmp_wsj_0814_class_05_2_u_de AS
 --在订v2
 DROP table IF EXISTS cdmpview.tmp_wsj_0814_class_05_2_order_detailv2 ;
 CREATE TABLE cdmpview.tmp_wsj_0814_class_05_2_order_detailv2 AS
-SELECT '201705'statis_month,cc.company_id,
+SELECT '201705'statis_month,
+       cc.company_id,
        a.usernum
 FROM intdata.ugc_90104_monthorder a         ---------------
 join rptdata.dim_charge_product c
@@ -52,7 +53,8 @@ DROP table IF EXISTS cdmpview.tmp_wsj_0814_class_05_2_uv3 ;
 CREATE TABLE cdmpview.tmp_wsj_0814_class_05_2_uv3 AS
 select v.statis_month,v.company_id,count(v.usernum_id)user_unum
 from(
-    SELECT '201705'statis_month,a.company_id,
+    SELECT '201705'statis_month,
+           a.company_id,
            a.usernum_id
     FROM cdmpview.tmp_wsj_0814_class_05_2_u_de a
     WHERE A.statis_month='201705'

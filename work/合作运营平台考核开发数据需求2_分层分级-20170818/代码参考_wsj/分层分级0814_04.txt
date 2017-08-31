@@ -11,10 +11,10 @@ CREATE TABLE cdmpview.tmp_wsj_0814_class_04_2_u_de AS
     FROM rptdata.fact_use_detail a         -------------------------
     
     join cdmpview.tmp_zj_0802_CID cc    --通过 sub_busi_id 找到 company_id
-		on a.sub_busi_id=cc.sub_busi_id
+      on a.sub_busi_id=cc.sub_busi_id
         
-   LEFT JOIN rptdata.dim_dept_term_prod  b 
-   ON a.termprod_id=b.term_prod_id
+    LEFT JOIN rptdata.dim_dept_term_prod  b 
+    ON a.termprod_id=b.term_prod_id
    
     LEFT JOIN cdmpview.tmp_wsj_0606_dim_busi_new  c 
     ON cc.business_id=c.business_id
@@ -44,7 +44,7 @@ on a.product_id=c.chrgprod_id
 join cdmpview.tmp_zj_0802_CID cc
 on c.sub_busi_bdid=cc.sub_busi_id
 
-WHERE a.src_file_day='20170430'
+WHERE a.src_file_day='20170430' --
 AND c.chrgprod_price >0
 GROUP BY cc.company_id,
        a.usernum;
@@ -53,7 +53,9 @@ GROUP BY cc.company_id,
        
 DROP table IF EXISTS cdmpview.tmp_wsj_0814_class_04_2_orderv2 ;
 CREATE TABLE cdmpview.tmp_wsj_0814_class_04_2_orderv2 AS
-select a.statis_month,a.company_id,count(a.usernum)user_unum
+select a.statis_month,
+       a.company_id,
+       count(a.usernum)user_unum
 from cdmpview.tmp_wsj_0814_class_04_2_order_detailv2 a
 group by a.statis_month,a.company_id;
 

@@ -55,7 +55,7 @@ select  business_type                       --优化一：在子查询中剔重
           left join rptdata.dim_chn g
             on (case when a.chn_id_new = '-998' then concat('', rand()) else a.chn_id_new end) = g.chn_id 
          where '${EXTRACT_MONTH}' <=  '201705'
-           and a.order_type = 1 
+           and a.order_type = 1  
            and a.src_source_day between '${EXTRACT_MONTH}01' and '${EXTRACT_MONTH}31' 
        ) t
  group by business_type ,business_name ,sub_business_name ,phone_province_name ,channel_id
