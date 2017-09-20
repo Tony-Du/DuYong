@@ -7,7 +7,7 @@ Git 配置：
  ssh-keygen -t rsa -C "duyong@aspirecn.com" 
 (
 Your identification has been saved in /c/Users/Tony/.ssh/id_rsa.
-Your public key has been saved in /c/Users/Tony/.ssh/id_rsa.pub.
+Your public key has been saved in /c/Users/Tony/.ssh/id_rsa.pub.(需要粘贴的)
 )
 
  将密匙拷贝到Git网页的个人密匙中(添加)
