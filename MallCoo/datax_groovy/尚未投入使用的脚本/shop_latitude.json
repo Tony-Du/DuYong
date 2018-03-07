@@ -1,0 +1,56 @@
+{
+    "job": {
+        "content": [{
+            "reader": {
+                "name": "mallcoo_mongodbreader",
+                "parameter": {
+                    "collectionName": "ShopLatitude",
+                    "column": [
+                        { "name": "MallID" },
+                        { "name": "ShopID" },
+                        { "name": "BrandName" },
+                        { "name": "BrandID" },
+                        { "name": "CommercialFirstID" },
+                        { "name": "CommercialFirstName" },
+                        { "name": "CommercialSecondID" },
+						{ "name": "CommercialSecondName" },
+						{ "name": "ChargingType" },
+                        { "name": "ChargingTypeID" },
+                        { "name": "ConsumePrePerson" },
+						{ "name": "ConsumeType" },
+                        { "name": "ConsumeTypeID" }
+                    ],
+                    "dbName": "Mallcoo",
+                    "url":"$url/Mallcoo.ShopLatitude$qs"
+                }
+            },
+            "writer": {
+                "name": "hdfswriter",
+                "parameter": {
+                    "column": [
+                        { "name": "MallID", "type": "bigint" },
+                        { "name": "ShopID", "type": "bigint" },
+                        { "name": "BrandName", "type": "string" },
+                        { "name": "BrandID", "type": "bigint" },
+                        { "name": "CommercialFirstID", "type": "bigint" },
+                        { "name": "CommercialFirstName", "type": "string" },
+                        { "name": "CommercialSecondID", "type": "bigint" },
+						{ "name": "CommercialSecondName", "type": "string" },
+						{ "name": "ChargingType", "type": "string" },
+                        { "name": "ChargingTypeID", "type": "bigint" },
+                        { "name": "ConsumePrePerson", "type": "double" },
+						{ "name": "ConsumeType", "type": "string" },
+                        { "name": "ConsumeTypeID", "type": "bigint" }
+                    ],
+                    "defaultFS": "hdfs://hadoop000:9000",
+                    "fieldDelimiter": "\1",
+                    "fileName": "$filename",
+                    "fileType": "orc",
+                    "path": "/user/root/hive/probe.db/shoplatitude",
+                    "writeMode": "append"
+                }
+            }
+        }],
+        "setting": { "speed": { "channel": $channel } }
+    }
+}
