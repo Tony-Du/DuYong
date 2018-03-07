@@ -1,0 +1,13 @@
+
+Mallcoo.AppInfo 对应的hive表 mongo.appinfo 需要重新创建， 字段增多了。
+Mallcoo.PushConfig 对应的hive表 mongo.PushConfig01 需要重新创建， 字段增多了。
+Mallcoo.ProvinceCityArea 对应的hive表 customer.ProvinceCityArea 需要重新创建， 增加字段 _id。
+SP_UserCenter.Checkin 对应的hive表 crm.checkin 需要重新创建， 增加很多字段。
+MallcooExt.AppPageView 对应的hive表 online.AppPageView 需要重新创建， 增加很多字段。
+Lottery.AwardCoupon 对应的hive表 online.AwardCoupon 需要重新创建，减少了2个字段
+
+Mallcoo.GrouponCoupon 对应的hive表 online.GrouponCoupon 不需要重新创建
+Mallcoo.PPInfo 对应的hive表 online.PPInfo 不需要重新创建
+Mallcoo.MovieOrder 对应的hive表 online.movieorder 不需要重新创建
+Lottery.LotteryRecord 对应的hive表 online.LotteryRecord 不需要重新创建
+Mallcoo.GiftCoupon 对应的hive表 online.GiftCoupon 不需要重新创建

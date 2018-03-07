@@ -1,0 +1,99 @@
+{
+    "job": {
+        "content": [
+            {
+                "reader": {
+                    "name": "mongodbreader", 
+                    "parameter": {
+                        "collectionName": "AAA", 
+                        "column": [ 
+                          {
+                              "name": "mac"
+                          },
+                          {
+                              "name": "date"
+                          },
+                          {
+                              "name": "CreateTime"
+                          },
+                          {
+                              "name": "MallID"
+                          },
+                          {
+                              "name": "ShopID"
+                          },
+                          {
+                              "name": "retentiontime"
+                          },
+                          {
+                              "name": "in"
+                          },
+                          {
+                              "name": "out"
+                          }
+                        ], 
+                        "dbName": "MallcooStatistics",
+                        "userName": "", 
+                        "userPassword": "",
+                        "url":"mongodb://muser:1qaz2wsx@test:27017/?authSource=admin",
+                        "query":"{'date':{$lte:ISODate('2014-12-16T16:00:00Z')}}"
+                    }
+                }, 
+                "writer": {
+                    "name": "hdfswriter", 
+                    "parameter": {
+                        "column": [
+                          {
+                              "name": "mac",
+                              "type": "string"
+                          },
+                          {
+                              "name": "date",
+                              "type": "string"
+                          },
+                          {
+                              "name": "CreateTime",
+                              "type": "string"
+                          },
+                          {
+                              "name": "MallID",
+                              "type": "string"
+                          },
+                          {
+                              "name": "ShopID",
+                              "type": "string"
+                          },
+                          {
+                              "name": "retentiontime",
+                              "type": "string"
+                          },
+                          {
+                              "name": "in",
+                              "type": "string"
+                          },
+                          {
+                              "name": "out",
+                              "type": "string"
+                          }
+                        ], 
+                        "defaultFS": "hdfs://hadoop000:9000", 
+                        "fieldDelimiter": "\1", 
+                        "fileName": "mongo2hive", 
+                        "fileType": "orc", 
+                        "path": "/apps/tony_test/dataxtest/dataxtest/src_file_day=20141217", 
+                        "writeMode": "append"
+                    }
+                }
+            }
+        ], 
+        "setting": {
+            "speed": {
+                "channel": 4
+            }
+        }
+    }
+}
+
+
+
+

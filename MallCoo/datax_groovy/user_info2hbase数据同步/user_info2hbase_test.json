@@ -1,0 +1,57 @@
+{
+    "job": {
+        "content": [
+            {
+                "reader": {
+                    "name": "mongodbreader", 
+                    "parameter": {
+                        "collectionName": "UserInfo", 
+                        "column": [
+                          { "index": 0, "name": "_id", "type": "string" },                               
+                          { "index": 1, "name": "UID", "type": "string" },                               
+                          { "index": 2, "name": "FocusInfoList", "type": "Array", "splitter": "_" },                          
+                          { "index": 3, "name": "FocusInfoList", "type": "Array", "splitter": "_" },                      
+                          { "index": 4, "name": "ShoppingInterestList", "type": "Array", "splitter": "_"  },                               
+                          { "index": 5, "name": "ActiveInterestList", "type": "Array", "splitter": "_" },                             
+                          { "index": 6, "name": "MemberTagIDList", "type": "Array", "splitter": "_" },
+                          { "index": 7, "name": "UpdateTime", "type": "string" }                           
+                        ], 
+                        "dbName": "SP_UserCenter", 
+                        "url":"mongodb://sp1:28001,sp2:28001/SP_UserCenter.UserInfo",
+                        "query":"{'UpdateTime':{ $gt: ISODate('2017-12-06T16:00:00Z'), $lte: ISODate('2017-12-07T16:00:00Z') }}"
+                    }
+                }, 
+                "writer": {
+                    "name": "hbase11xwriter", 
+                    "parameter": {
+                        "column": [                            
+                          { "index": 1, "name": "cf1:UID", "type": "string" },                               
+                          { "index": 2, "name": "cf1:FocusInfoList", "type": "string" },                          
+                          { "index": 3, "name": "cf1:FocusInfoList", "type": "string" },                      
+                          { "index": 4, "name": "cf1:ShoppingInterestList", "type": "string" },                               
+                          { "index": 5, "name": "cf1:ActiveInterestList", "type": "string" },                             
+                          { "index": 6, "name": "cf1:MemberTagIDList", "type": "string" },
+                          { "index": 7, "name": "cf1:UpdateTime", "type": "string" }
+                        ], 
+                        "encoding": "utf-8", 
+                        "hbaseConfig": {
+                            "hbase.cluster.distributed": "true", 
+                            "hbase.rootdir": "hdfs://hadoop000:9000/hbase", 
+                            "hbase.zookeeper.quorum": "hadoop000,hadoop004,hadoop005"
+                        }, 
+                        "mode": "normal", 
+                        "rowkeyColumn": [{ "index":0, "type":"string"}], 
+                        "nullMode": "empty",
+                        "table": "dataxtest"
+                                                
+                    }
+                }
+            }
+        ], 
+        "setting": {
+            "speed": {
+                "channel": 4
+            }
+        }
+    }
+}

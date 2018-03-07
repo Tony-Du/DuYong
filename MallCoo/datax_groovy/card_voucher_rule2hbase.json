@@ -1,0 +1,137 @@
+{
+    "job": {
+        "content": [{
+            "reader": {
+                "name": "mallcoo_mongodbreader",
+                "parameter": {
+                    "collectionName": "CardVoucherRule",
+                    "column": [
+                        { "index": 0, "name": "_id", "type":"long" },                                         
+                        { "index": 1, "name": "RuleNo", "type":"string" },                                    
+                        { "index": 2, "name": "Name", "type":"string" },                                      
+                        { "index": 3, "name": "Subtitle", "type":"string" },                                  
+                        { "index": 4, "name": "Type", "type":"int" },                                         
+                        { "index": 5, "name": "SingleCosts", "type":"double" },                                                                  
+                        { "index": 6, "name": "ReduceMoney", "type":"double" },                               
+                        { "index": 7, "name": "Deductible", "type":"double" },                                
+                        { "index": 8, "name": "DiscountAmount", "type":"double" },                            
+                        { "index": 9, "name": "Desc", "type":"string" },                                                                
+                        { "index": 10, "name": "ConsumerHotline", "type":"string" },                                     
+                        { "index": 11, "name": "IsFixedDate", "type":"boolean" },                             
+                        { "index": 12, "name": "FixedDateBegin", "type":"date" },                             
+                        { "index": 13, "name": "FixedDateEnd", "type":"date" },                               
+                        { "index": 14, "name": "DelayEffectiveDays", "type":"int" },                          
+                        { "index": 15, "name": "EffectiveDays", "type":"int" },                               
+                        { "index": 16, "name": "IsAllTime", "type":"boolean" },                                     
+                        { "index": 17, "name": "StoreCount", "type":"int" },                                  
+                        { "index": 18, "name": "StoreOverCount", "type":"int" },                              
+                        { "index": 19, "name": "IsShareLQLink", "type":"boolean" },                           
+                        { "index": 20, "name": "IsDonationUser", "type":"boolean" },                          
+                        { "index": 21, "name": "Verification", "type":"int" },                                        
+                        { "index": 22, "name": "IsPwdForVerify", "type":"boolean" },                          
+                        { "index": 23, "name": "OperationTips", "type":"string" },                            
+                        { "index": 24, "name": "UseDesc", "type":"string" },                                  
+                        { "index": 25, "name": "IsThirdVCode", "type":"boolean" },                            
+                        { "index": 26, "name": "MallID", "type":"long" },                                     
+                        { "index": 27, "name": "InsteadMoney", "type":"double" },                             
+                        { "index": 28, "name": "InsteadTime", "type":"long" },                                
+                        { "index": 29, "name": "TimeBegin", "type":"string" },                                
+                        { "index": 30, "name": "TimeEnd", "type":"string" },                                  
+                        { "index": 31, "name": "CreateID", "type":"long" },                                   
+                        { "index": 32, "name": "CreateName", "type":"string" },                               
+                        { "index": 33, "name": "CreateTime", "type":"date" },                                 
+                        { "index": 34, "name": "UpdateID", "type":"long" },                                   
+                        { "index": 35, "name": "UpdateName", "type":"string" },                               
+                        { "index": 36, "name": "UpdateTime", "type":"date" },                                 
+                        { "index": 37, "name": "State", "type":"int" },                                       
+                        { "index": 38, "name": "WXCheckState", "type":"int" },                                
+                        { "index": 39, "name": "WXDEC", "type":"int" },                                       
+                        { "index": 40, "name": "ExchangeInfo", "type":"string" },                             
+                        { "index": 41, "name": "YouHuiInfo", "type":"string" },                               
+                        { "index": 42, "name": "WXCardID", "type":"string" },                                 
+                        { "index": 43, "name": "Subsidy", "type":"int" },                                     
+                        { "index": 44, "name": "ShowType", "type":"int" }                                     
+                    ],
+                    "dbName": "Coupon",
+                    "url": "$url",
+                    "query":"{'UpdateTime':{$gte:ISODate($start),$lt:ISODate($end)}}"
+                }
+            },
+            "writer": {
+                "name": "hbase11xwriter",
+                "parameter": {
+                    "column": [                                      
+                        { "index": 0,  "name": "data:_id", "type":"long" },                                         
+                        { "index": 1,  "name": "data:RuleNo", "type":"string" },                                    
+                        { "index": 2,  "name": "data:Name", "type":"string" },                                      
+                        { "index": 3,  "name": "data:Subtitle", "type":"string" },                                  
+                        { "index": 4,  "name": "data:Type", "type":"int" },                                         
+                        { "index": 5,  "name": "data:SingleCosts", "type":"double" },                                                                  
+                        { "index": 6,  "name": "data:ReduceMoney", "type":"double" },                               
+                        { "index": 7,  "name": "data:Deductible", "type":"double" },                                
+                        { "index": 8,  "name": "data:DiscountAmount", "type":"double" },                            
+                        { "index": 9,  "name": "data:Desc", "type":"string" },                                                                
+                        { "index": 10, "name": "data:ConsumerHotline", "type":"string" },                                     
+                        { "index": 11, "name": "data:IsFixedDate", "type":"boolean" },                             
+                        { "index": 12, "name": "data:FixedDateBegin", "type":"string" },                             
+                        { "index": 13, "name": "data:FixedDateEnd", "type":"string" },                               
+                        { "index": 14, "name": "data:DelayEffectiveDays", "type":"int" },                          
+                        { "index": 15, "name": "data:EffectiveDays", "type":"int" },                               
+                        { "index": 16, "name": "data:IsAllTime", "type":"boolean" },                                     
+                        { "index": 17, "name": "data:StoreCount", "type":"int" },                                  
+                        { "index": 18, "name": "data:StoreOverCount", "type":"int" },                              
+                        { "index": 19, "name": "data:IsShareLQLink", "type":"boolean" },                           
+                        { "index": 20, "name": "data:IsDonationUser", "type":"boolean" },                          
+                        { "index": 21, "name": "data:Verification", "type":"int" },                                        
+                        { "index": 22, "name": "data:IsPwdForVerify", "type":"boolean" },                          
+                        { "index": 23, "name": "data:OperationTips", "type":"string" },                            
+                        { "index": 24, "name": "data:UseDesc", "type":"string" },                                  
+                        { "index": 25, "name": "data:IsThirdVCode", "type":"boolean" },                            
+                        { "index": 26, "name": "data:MallID", "type":"long" },                                     
+                        { "index": 27, "name": "data:InsteadMoney", "type":"double" },                             
+                        { "index": 28, "name": "data:InsteadTime", "type":"long" },                                
+                        { "index": 29, "name": "data:TimeBegin", "type":"string" },                                
+                        { "index": 30, "name": "data:TimeEnd", "type":"string" },                                  
+                        { "index": 31, "name": "data:CreateID", "type":"long" },                                   
+                        { "index": 32, "name": "data:CreateName", "type":"string" },                               
+                        { "index": 33, "name": "data:CreateTime", "type":"string" },                                 
+                        { "index": 34, "name": "data:UpdateID", "type":"long" },                                   
+                        { "index": 35, "name": "data:UpdateName", "type":"string" },                               
+                        { "index": 36, "name": "data:UpdateTime", "type":"string" },                                 
+                        { "index": 37, "name": "data:State", "type":"int" },                                       
+                        { "index": 38, "name": "data:WXCheckState", "type":"int" },                                
+                        { "index": 39, "name": "data:WXDEC", "type":"int" },                                       
+                        { "index": 40, "name": "data:ExchangeInfo", "type":"string" },                             
+                        { "index": 41, "name": "data:YouHuiInfo", "type":"string" },                               
+                        { "index": 42, "name": "data:WXCardID", "type":"string" },                                 
+                        { "index": 43, "name": "data:Subsidy", "type":"int" },                                     
+                        { "index": 44, "name": "data:ShowType", "type":"int" }                     
+                    ],
+                    "encoding": "utf-8", 
+                    "hbaseConfig": {
+                        "hbase.cluster.distributed": "true", 
+                        "hbase.rootdir": "hdfs://hadoop000:9000/hbase", 
+                        "hbase.zookeeper.quorum": "hadoop000,hadoop004,hadoop005"
+                    }, 
+                    "mode": "normal", 
+                    "rowkeyColumn": [{ "index":0, "type":"long"}], 
+                    "table": "card_voucher_rule",
+                    "nullMode": "empty"
+                }
+            },
+            "transformer": [
+                { "name": "dx_groovy",
+                  "parameter": { "code": "SimpleDateFormat sdf = new SimpleDateFormat(\"yyyy-MM-dd HH:mm:ss\");
+                                          record.setColumn(12, new StringColumn(sdf.format(record.getColumn(12).asDate()))); //FixedDateBegin
+                                          record.setColumn(13, new StringColumn(sdf.format(record.getColumn(13).asDate()))); //FixedDateEnd
+                                          record.setColumn(33, new StringColumn(sdf.format(record.getColumn(33).asDate()))); //CreateTime
+                                          record.setColumn(36, new StringColumn(sdf.format(record.getColumn(36).asDate()))); //UpdateTime
+                                          return record;",                                            
+                                 "extraPackage":[ "import java.text.SimpleDateFormat;" ] 
+                               }                                 
+                }
+            ]
+        }],
+        "setting": { "speed": { "channel": $channel } }
+    }
+}

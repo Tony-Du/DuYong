@@ -1,0 +1,49 @@
+{
+    "job": {
+        "content": [{
+            "reader": {
+                "name": "mallcoo_mongodbreader",
+                "parameter": {
+                    "collectionName": "GrouponRefund",
+                    "column": [
+                        { "name": "MallID" },
+                        { "name": "UID" },
+                        { "name": "GrouponID" },
+                        { "name": "OrderNo" },
+                        { "name": "GrouponName" },
+                        { "name": "CreateTime" },
+                        { "name": "RefundStatus" },
+						{ "name": "Reason" },
+                        { "name": "RefundPrice" }
+                    ],
+                    "dbName": "Mallcoo",
+                    "url":"$url/Mallcoo.GrouponRefund$qs",
+					"query":"{'CreateTime':{ $gt: $start,$lte: $end }}"
+                }
+            },
+            "writer": {
+                "name": "hdfswriter",
+                "parameter": {
+                    "column": [
+                        { "name": "MallID", "type": "bigint" },
+                        { "name": "UID", "type": "bigint" },
+                        { "name": "GrouponID", "type": "bigint" },
+                        { "name": "OrderNo", "type": "bigint" },
+                        { "name": "GrouponName", "type": "string" },
+                        { "name": "CreateTime", "type": "timestamp" },
+                        { "name": "RefundStatus", "type": "int" },
+						{ "name": "Reason", "type": "string" },
+                        { "name": "RefundPrice", "type": "double" }
+                    ],
+                    "defaultFS": "hdfs://hadoop000:9000",
+                    "fieldDelimiter": "\1",
+                    "fileName": "$filename",
+                    "fileType": "orc",
+                    "path": "/user/root/hive/online.db/grouponrefund",
+                    "writeMode": "append"
+                }
+            }
+        }],
+        "setting": { "speed": { "channel": $channel } }
+    }
+}

@@ -1,0 +1,44 @@
+{
+    "job": {
+        "content": [{
+            "reader": {
+                "name": "mallcoo_mongodbreader",
+                "parameter": {
+                    "collectionName": "ProvinceCityArea",
+                    "column": [
+                        { "name": "_id" },
+                        { "name": "Code" },
+						{ "name": "Name" },
+						{ "name": "ParentCode" },
+						{ "name": "MallID" },
+						{ "name": "Level" },
+						{ "name": "Sort" }
+                    ],
+                    "dbName": "Mallcoo",
+                    "url":"$url/Mallcoo.ProvinceCityArea$qs"
+                }
+            },
+            "writer": {
+                "name": "hdfswriter",
+                "parameter": {
+                    "column": [
+                        { "name": "id", "type": "string" },
+                        { "name": "Code", "type": "bigint" },
+						{ "name": "Name", "type": "string" },
+						{ "name": "ParentCode", "type": "bigint" },
+						{ "name": "MallID", "type": "string" },
+						{ "name": "Level", "type": "string" },
+						{ "name": "Sort", "type": "int" }
+                    ],
+                    "defaultFS": "hdfs://hadoop000:9000",
+                    "fieldDelimiter": "\1",
+                    "fileName": "$filename",
+                    "fileType": "orc",
+                    "path": "/user/root/hive/customer.db/ProvinceCityArea",
+                    "writeMode": "append"
+                }
+            }
+        }],
+        "setting": { "speed": { "channel": $channel } }
+    }
+}

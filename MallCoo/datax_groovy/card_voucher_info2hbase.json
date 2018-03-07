@@ -1,0 +1,127 @@
+{
+    "job": {
+        "content": [{
+            "reader": {
+                "name": "mallcoo_mongodbreader",
+                "parameter": {
+                    "collectionName": "CardVoucherInfo",
+                    "column": [
+                        { "index": 0, "name": "_id", "type":"long" },
+                        { "index": 1, "name": "CVRID", "type":"long" },
+                        { "index": 2, "name": "Type", "type":"int" },
+                        { "index": 3, "name": "Name", "type":"string" },
+                        { "index": 4, "name": "IsThirdVCode", "type":"boolean" },
+                        { "index": 5, "name": "OPType", "type":"int" },
+                        { "index": 6, "name": "PICID", "type":"long" },     
+                        { "index": 7, "name": "ChannelNo", "type":"string" },
+                        { "index": 8, "name": "MallID", "type":"long" },
+                        { "index": 9, "name": "OriginalUID", "type":"long" },                       
+                        { "index": 10, "name": "UserID", "type":"long" },
+                        { "index": 11, "name": "UserName", "type":"string" },
+                        { "index": 12, "name": "NickName", "type":"string" },
+                        { "index": 13, "name": "CardNo", "type":"string" },                     
+                        { "index": 14, "name": "Mobile", "type":"string" },
+                        { "index": 15, "name": "Verification", "type":"int"},
+                        { "index": 16, "name": "OperatorShopID", "type":"long" },                       
+                        { "index": 17, "name": "OperatorShopName", "type":"string" },
+                        { "index": 18, "name": "OperatorMallID", "type":"long" },
+                        { "index": 19, "name": "OperatorMallName", "type":"string" },                       
+                        { "index": 20, "name": "OperatorID", "type":"long" },
+                        { "index": 21, "name": "OperatorName", "type":"string" },                       
+                        { "index": 22, "name": "OperatorTime", "type":"date" },
+                        { "index": 23, "name": "DelTime", "type":"date" },
+                        { "index": 24, "name": "EnableTime", "type":"date" },
+                        { "index": 25, "name": "OverdueTime", "type":"date" },
+                        { "index": 26, "name": "VCode", "type":"string" },
+                        { "index": 27, "name": "CreateTime", "type":"date" },
+                        { "index": 28, "name": "ReceiveState", "type":"int" },
+                        { "index": 29, "name": "WXReceiveState", "type":"int" },
+                        { "index": 30, "name": "UseState", "type":"int" },
+                        { "index": 31, "name": "IsExistWX", "type":"boolean" },
+                        { "index": 32, "name": "State", "type":"int" },                                             
+                        { "index": 33, "name": "ReceiveTime", "type":"date" },
+                        { "index": 34, "name": "WXCardID", "type":"string" },
+                        { "index": 35, "name": "PICMID", "type":"long" },
+                        { "index": 36, "name": "TraceID", "type":"string" },
+                        { "index": 37, "name": "ThirdPartyID", "type":"string" },
+                        { "index": 38, "name": "ThirdPartyName", "type":"string" },
+                        { "index": 39, "name": "TPIID", "type":"string" }
+                    ],
+                    "dbName": "Coupon_Ext",
+                    "url": "$url/Coupon_Ext.CardVoucherInfo$qs"
+                }
+            },
+            "writer": {
+                "name": "hbase11xwriter",
+                "parameter": {
+                    "column": [
+                        { "index": 1,  "name": "data:CVRID", "type":"long" },
+                        { "index": 2,  "name": "data:Type", "type":"int" },
+                        { "index": 3,  "name": "data:Name", "type":"string" },
+                        { "index": 4,  "name": "data:IsThirdVCode", "type":"boolean" },
+                        { "index": 5,  "name": "data:OPType", "type":"int" },
+                        { "index": 6,  "name": "data:PICID", "type":"long" },       
+                        { "index": 7,  "name": "data:ChannelNo", "type":"string" },
+                        { "index": 8,  "name": "data:MallID", "type":"long" },
+                        { "index": 9,  "name": "data:OriginalUID", "type":"long" },                     
+                        { "index": 10, "name": "data:UserID", "type":"long" },
+                        { "index": 11, "name": "data:UserName", "type":"string" },
+                        { "index": 12, "name": "data:NickName", "type":"string" },
+                        { "index": 13, "name": "data:CardNo", "type":"string" },                        
+                        { "index": 14, "name": "data:Mobile", "type":"string" },
+                        { "index": 15, "name": "data:Verification", "type":"int"},
+                        { "index": 16, "name": "data:OperatorShopID", "type":"long" },                      
+                        { "index": 17, "name": "data:OperatorShopName", "type":"string" },
+                        { "index": 18, "name": "data:OperatorMallID", "type":"long" },
+                        { "index": 19, "name": "data:OperatorMallName", "type":"string" },                      
+                        { "index": 20, "name": "data:OperatorID", "type":"long" },
+                        { "index": 21, "name": "data:OperatorName", "type":"string" },                      
+                        { "index": 22, "name": "data:OperatorTime", "type":"string" },
+                        { "index": 23, "name": "data:DelTime", "type":"string" },
+                        { "index": 24, "name": "data:EnableTime", "type":"string" },
+                        { "index": 25, "name": "data:OverdueTime", "type":"string" },
+                        { "index": 26, "name": "data:VCode", "type":"string" },
+                        { "index": 27, "name": "data:CreateTime", "type":"string" },
+                        { "index": 28, "name": "data:ReceiveState", "type":"int" },
+                        { "index": 29, "name": "data:WXReceiveState", "type":"int" },
+                        { "index": 30, "name": "data:UseState", "type":"int" },
+                        { "index": 31, "name": "data:IsExistWX", "type":"boolean" },
+                        { "index": 32, "name": "data:State", "type":"int" },                                                
+                        { "index": 33, "name": "data:ReceiveTime", "type":"string" },
+                        { "index": 34, "name": "data:WXCardID", "type":"string" },
+                        { "index": 35, "name": "data:PICMID", "type":"long" },
+                        { "index": 36, "name": "data:TraceID", "type":"string" },
+                        { "index": 37, "name": "data:ThirdPartyID", "type":"string" },
+                        { "index": 38, "name": "data:ThirdPartyName", "type":"string" },
+                        { "index": 39, "name": "data:TPIID", "type":"string" }
+                    ],
+                    "encoding": "utf-8", 
+                    "hbaseConfig": {
+                        "hbase.cluster.distributed": "true", 
+                        "hbase.rootdir": "hdfs://hadoop000:9000/hbase", 
+                        "hbase.zookeeper.quorum": "hadoop000,hadoop004,hadoop005"
+                    }, 
+                    "mode": "normal", 
+                    "rowkeyColumn": [{ "index":0, "type":"long"}], 
+                    "table": "card_voucher_info",
+                    "nullMode": "empty"
+                }
+            },
+            "transformer": [
+                { "name": "dx_groovy",
+                  "parameter": { "code": "SimpleDateFormat sdf = new SimpleDateFormat(\"yyyy-MM-dd HH:mm:ss\");
+                                          record.setColumn(22, new StringColumn(sdf.format(record.getColumn(22).asDate())));
+                                          record.setColumn(23, new StringColumn(sdf.format(record.getColumn(23).asDate())));
+                                          record.setColumn(24, new StringColumn(sdf.format(record.getColumn(24).asDate())));
+                                          record.setColumn(25, new StringColumn(sdf.format(record.getColumn(25).asDate())));
+                                          record.setColumn(27, new StringColumn(sdf.format(record.getColumn(27).asDate())));
+                                          record.setColumn(33, new StringColumn(sdf.format(record.getColumn(33).asDate())));
+                                          return record;",                                            
+                                 "extraPackage":[ "import java.text.SimpleDateFormat;" ] 
+                               }                                 
+                }
+            ]
+        }],
+        "setting": { "speed": { "channel": $channel } }
+    }
+}

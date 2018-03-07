@@ -1,0 +1,63 @@
+{
+    "job": {
+        "content": [
+            {
+                "reader": {
+                    "name": "mongodbreader", 
+                    "parameter": {
+                        "collectionName": "AAA", 
+                        "column": [ 
+                          { "name": "mac" },
+                          { "name": "date" },
+                          { "name": "CreateTime" },
+                          { "name": "MallID" },
+                          { "name": "ShopID" },
+                          { "name": "retentiontime" },
+                          { "name": "in" },
+                          { "name": "flag" },
+                          { "name": "out" }
+                        ], 
+                        "dbName": "MallcooStatistics",
+                        "userName": "", 
+                        "userPassword": "",
+                        "url":"mongodb://muser:1qaz2wsx@test:27017/?authSource=admin",
+                        "query":"{'date':{$lte:ISODate('2014-12-16T16:00:00Z')}}"
+                    }
+                }, 
+                "writer": {
+                    "name": "hdfswriter", 
+                    "parameter": {
+                        "column": [
+                          { "name": "mac", "type": "string" },
+                          { "name": "date", "type": "string" },
+                          { "name": "CreateTime", "type": "string" },
+                          { "name": "MallID", "type": "string" },
+                          { "name": "ShopID", "type": "string" },
+                          { "name": "retentiontime", "type": "string" },
+                          { "name": "in", "type": "string" },
+                          { "name": "flag", "type": "string" },
+                          { "name": "out", "type": "string" }
+                        ], 
+                        "defaultFS": "hdfs://thahadoop001:8020", 
+                        "fieldDelimiter": "\1", 
+                        "fileName": "mongo2hive", 
+                        "fileType": "orc", 
+                        "path": "/user/hive/warehouse/test.db/datax_groovy_t", 
+                        "writeMode": "append"
+                    }
+                },
+                "transformer": [
+                    { "name": "dx_groovy",
+                      "parameter": { "code": "record.setColumn(7, new StringColumn(\"program\")); return record;" 
+                                   }  
+                    }
+                ]
+            }
+        ], 
+        "setting": {
+            "speed": {
+                "channel": 4
+            }
+        }
+    }
+}

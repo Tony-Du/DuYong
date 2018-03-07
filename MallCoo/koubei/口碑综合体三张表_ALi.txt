@@ -1,0 +1,69 @@
+--综合体三张表
+表1：alipay_ddm_adm_ddm_ot_mall_user_acm_trade_dd
+解释：综合体用户累计消费汇总表 
+PID  string  综合体的PID
+mall_shop_id  string  综合体的shop_id
+mall_shop_name  string  综合体的名称
+
+user_id  string  用户的ID
+user_type  string  用户的类型(alipay,weixin,offline,other)
+cate_name_2  string  综合体下的二级类目
+biz_date  string  消费日期（保留最近180天的所有交易）
+trade_hour  bigint  消费的时间段（1~24）
+
+trade_amt  bigint  累计消费金额(分)
+trade_cnt  bigint  累计消费笔数
+dt  string  日期(全量表,只用最近1天分区) 
+
+
+
+
+8483fc92c972271b9679f0a19a5e4c65
+
+
+表2: alipay_ddm_adm_ddm_ot_mall_shop_comment_dd
+解释：综合体下门店的评论明细表
+PID  string  综合体的PID
+mall_shop_id  string  综合体的shop_id
+mall_shop_name  string  综合体的名称
+shop_id  string  综合体下门店的ID
+shop_name  string  综合体下门店的名称
+
+content  string  评论的内容
+comment_time  string  评论的时间（保留最近180天的所有评论）
+comment_score  bigint  最高为5星，1-5星，用户的评价
+comment_tag  bigint  是否为优质评论
+dt  string  日期(全量表，只用最近一天分区)
+
+
+
+
+
+
+表3:alipay_ddm_adm_ddm_ot_mall_hot_diagram_dd   --增加 目标的经度 和 目标的纬度 字段
+解释:综合体人群分布热力图表
+pid  string  综合体的PID
+mall_shop_id  string 综合体的shop_id
+mall_shop_name  string综合体的名称
+lbs_tag  string  位置属性(工作位置/家庭位置)
+mall_shop_lng  double  mall的经度
+mall_shop_lat  double  mall的纬度
+lng           double   目标的经度
+lat           double   目标的纬度
+target_name  string  社区名称community_name/公司名称office_name
+user_cnt  bigint  对应人数
+
+gmt_create  string  创建时间
+gmt_modified string  修改时间
+dt  string  日期(全量表，只用最近一天分区)
+
+
+
+
+
+ALTER TABLE table_name SET lifecycle days;  
+
+
+
+
+

@@ -1,0 +1,51 @@
+{
+    "job": {
+        "content": [{
+            "reader": {
+                "name": "mongodbreader", 
+                "parameter": {
+                    "collectionName": "WeixinCallbackMessage", 
+                    "column": [
+                        { "name": "_id"},
+                        { "name": "MallID" },
+                        { "name": "Event" },
+                        { "name": "EventKey" },
+                        { "name": "Ticket" },                        
+                        { "name": "MsgType" },
+                        { "name": "MsgId" },
+                        { "name": "ToUserName" },
+                        { "name": "FromUserName" },
+                        { "name": "CreateTime" }
+                    ], 
+                    "dbName": "SP_OPService", 
+                    "url":"mongodb://sp1:28001,sp2:28001/SP_OPService.WeixinCallbackMessage",
+                    "query":"{'_id':{ $gt:$start,$lte:$end }}"
+                }
+            }, 
+            "writer": {
+                "name": "hdfswriter", 
+                "parameter": {
+                    "column": [
+                        { "name": "id", "type":"string" },
+                        { "name": "MallID", "type": "bigint" },
+                        { "name": "Event", "type": "string" },
+                        { "name": "EventKey", "type": "string" },
+                        { "name": "Ticket", "type": "string" },
+                        { "name": "MsgType", "type": "string" },
+                        { "name": "MsgId", "type": "string" },
+                        { "name": "ToUserName", "type": "string" },
+                        { "name": "FromUserName", "type":"string" },
+                        { "name": "CreateTime", "type":"timestamp" }
+                    ], 
+                    "defaultFS": "hdfs://hadoop000:9000",
+                    "fieldDelimiter": "\1",
+                    "fileName": "$filename",
+                    "fileType": "orc",
+                    "path": "/user/root/hive/pqr.db/weixincallbackmessage",
+                    "writeMode": "append"
+                }
+            }
+        }], 
+        "setting": { "speed": { "channel": 4 } }
+    }
+}

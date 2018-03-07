@@ -1,0 +1,67 @@
+{
+    "job": {
+        "content": [{
+            "reader": {
+                "name": "mallcoo_mongodbreader",
+                "parameter": {
+                    "collectionName": "PushConfig",
+                    "column": [
+                        { "name": "IMEI" },
+                        { "name": "Source" },
+						{ "name": "UID" },
+						{ "name": "AppType" },
+						{ "name": "AppName" },
+						{ "name": "UserID" },
+						{ "name": "ChannelID" },
+						{ "name": "AppID" },
+						{ "name": "DeviceToken" },
+						{ "name": "PhoneSystemVersion" },
+						{ "name": "PhoneModel" },
+						{ "name": "AppVersion" },
+						{ "name": "MacAddress" },
+						{ "name": "City" },
+						{ "name": "MD5" },
+						{ "name": "CreateTime" },
+						{ "name": "UpdateTime" },
+						{ "name": "IosPVT" }
+                    ],
+                    "dbName": "Mallcoo",
+                    "url":"$url/Mallcoo.PushConfig$qs",
+					"query":"{'CreateTime':{ $gt: $start,$lte: $end }}"
+                }
+            },
+            "writer": {
+                "name": "hdfswriter",
+                "parameter": {
+                    "column": [
+                        { "name": "IMEI", "type": "string" },
+                        { "name": "Source", "type": "int" },
+						{ "name": "UID", "type": "bigint" },
+						{ "name": "AppType", "type": "int" },
+						{ "name": "AppName", "type": "string" },
+						{ "name": "UserID", "type": "bigint" },
+						{ "name": "ChannelID", "type": "bigint" },
+						{ "name": "AppID", "type": "bigint" },
+						{ "name": "DeviceToken", "type": "string" },
+						{ "name": "PhoneSystemVersion", "type": "string" },
+						{ "name": "PhoneModel", "type": "string" },
+						{ "name": "AppVersion", "type": "string" },
+						{ "name": "MacAddress", "type": "string" },
+						{ "name": "City", "type": "string" },
+						{ "name": "MD5", "type": "string" },
+						{ "name": "CreateTime", "type": "timestamp" },
+						{ "name": "UpdateTime", "type": "timestamp" },
+						{ "name": "IosPVT", "type": "int" }
+                    ],
+                    "defaultFS": "hdfs://hadoop000:9000",
+                    "fieldDelimiter": "\1",
+                    "fileName": "$filename",
+                    "fileType": "orc",
+                    "path": "/user/root/hive/mongo.db/PushConfig01",
+                    "writeMode": "append"
+                }
+            }
+        }],
+        "setting": { "speed": { "channel": $channel } }
+    }
+}

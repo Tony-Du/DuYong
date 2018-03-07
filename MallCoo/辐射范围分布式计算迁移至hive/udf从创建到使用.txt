@@ -1,0 +1,15 @@
+maven 多项目管理:
+1.新建一个module,注意不是新建一个project
+(父pom.xml文件的package是 pom, 不是jar)
+
+2.run as ===> build as ===> maven build(第二个) ===> goals(填写package)
+注意:这里打jar包的时候可能报错，如下：
+No compiler is provided in this environment. Perhaps you are running on a JRE rather than a JDK
+解决办法：windows ==> preferences ==> java ==> installed JREs 改一下jdk的路径，
+注意到jdk(D:\TONY\Mallcoo\softs\java_jdk)就好了，不需要到jre(D:\TONY\Mallcoo\softs\java_jdk\jre7)
+
+3.把打包好的 jar包 放到 HDFS 任意目录下(/apps/tony_test 直接拖拽即可)
+注：hadoop dfs -put MapDistance-0.0.1-SNAPSHOT.jar /udf/....
+
+4.CREATE FUNCTION GET_MAP_DISTANCE AS 'cn.mallcoo.udf.MapDistance' USING JAR 'hdfs:///udf/MapDistance-0.0.1-SNAPSHOT.jar';
+上述语句会创建永久的函数

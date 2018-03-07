@@ -1,0 +1,49 @@
+{
+    "job": {
+        "content": [{
+            "reader": {
+                "name": "mallcoo_mongodbreader",
+                "parameter": {
+                    "collectionName": "PromotionSign",
+                    "column": [
+                        { "name": "MallID" },
+                        { "name": "UID" },
+                        { "name": "PromotionID" },
+                        { "name": "PromotionName" },
+                        { "name": "Mobile" },
+                        { "name": "Status" },
+                        { "name": "SignTime" },
+						{ "name": "IsConsumed" },
+                        { "name": "ConsumeTime" }
+                    ],
+                    "dbName": "SP_Mall",
+                    "url":"$url/SP_Mall.PromotionSign$qs",
+					"query":"{'SignTime':{ $gt: $start,$lte: $end }}"
+                }
+            },
+            "writer": {
+                "name": "hdfswriter",
+                "parameter": {
+                    "column": [
+                        { "name": "MallID", "type": "bigint" },
+                        { "name": "UID", "type": "bigint" },
+                        { "name": "PromotionID", "type": "bigint" },
+                        { "name": "PromotionName", "type": "string" },
+                        { "name": "Mobile", "type": "string" },
+                        { "name": "Status", "type": "int" },
+                        { "name": "SignTime", "type": "timestamp" },
+						{ "name": "IsConsumed", "type": "boolean" },
+                        { "name": "ConsumeTime", "type": "timestamp" }
+                    ],
+                    "defaultFS": "hdfs://hadoop000:9000",
+                    "fieldDelimiter": "\1",
+                    "fileName": "$filename",
+                    "fileType": "orc",
+                    "path": "/user/root/hive/crm.db/promotionsign",
+                    "writeMode": "append"
+                }
+            }
+        }],
+        "setting": { "speed": { "channel": $channel } }
+    }
+}

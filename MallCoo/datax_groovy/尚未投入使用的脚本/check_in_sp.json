@@ -1,0 +1,63 @@
+{
+    "job": {
+        "content": [{
+            "reader": {
+                "name": "mallcoo_mongodbreader",
+                "parameter": {
+                    "collectionName": "Checkin",
+                    "column": [
+                        { "name": "_id" },
+                        { "name": "UID" },
+                        { "name": "MallID" },
+                        { "name": "Longitude" },
+                        { "name": "Latitude" },
+                        { "name": "InMall" },
+                        { "name": "X" },
+                        { "name": "Y" },
+                        { "name": "CheckinTime" },
+                        { "name": "MillisecondsTime" },
+                        { "name": "Source" },
+                        { "name": "Ip" },
+                        { "name": "City" },
+                        { "name": "Message" },
+                        { "name": "UniqueIndex" },
+                        { "name": "ID_PP" }
+                    ],
+                    "dbName": "SP_UserCenter",
+                    "url":"$url/SP_UserCenter.Checkin$qs",
+					"query":"{'ID':{ $gt: $start,$lte: $end }}"
+                }
+            },
+            "writer": {
+                "name": "hdfswriter",
+                "parameter": {
+                    "column": [
+                        { "name": "id", "type": "bigint" },
+                        { "name": "UID", "type": "bigint" },
+                        { "name": "MallID", "type": "bigint" },
+                        { "name": "Longitude", "type": "double" },
+                        { "name": "Latitude", "type": "double" },
+                        { "name": "InMall", "type": "int" },
+                        { "name": "X", "type": "double" },
+                        { "name": "Y", "type": "double" },
+                        { "name": "CheckinTime", "type": "timestamp" },
+                        { "name": "MillisecondsTime", "type": "bigint" },
+                        { "name": "Source", "type": "int" },
+                        { "name": "Ip", "type": "string" },
+                        { "name": "City", "type": "string" },
+                        { "name": "Message", "type": "string" },
+                        { "name": "UniqueIndex", "type": "string" },
+                        { "name": "ID_PP", "type": "bigint" }
+                    ],
+                    "defaultFS": "hdfs://hadoop000:9000",
+                    "fieldDelimiter": "\1",
+                    "fileName": "$filename",
+                    "fileType": "orc",
+                    "path": "/user/root/hive/crm.db/checkin",
+                    "writeMode": "append"
+                }
+            }
+        }],
+        "setting": { "speed": { "channel": $channel } }
+    }
+}

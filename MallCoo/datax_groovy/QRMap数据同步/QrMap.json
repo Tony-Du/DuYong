@@ -1,0 +1,63 @@
+{
+    "job": {
+        "content": [{
+            "reader": {
+                "name": "mongodbreader", 
+                "parameter": {
+                    "collectionName": "QrMap", 
+                    "column": [                                  
+                        { "name": "_id", "type": "string" },
+                        { "name": "QrID", "type": "string" },
+                        { "name": "MallID", "type": "bigint" },
+                        { "name": "QrString", "type": "string" },
+                        { "name": "QrParam", "type": "string" },
+                        { "name": "IsWx", "type": "boolean" },
+                        { "name": "WXQR_ID", "type": "bigint" },
+						{ "name": "WXQR_ID_Per", "type": "string" },		
+                        { "name": "IsTemp", "type": "boolean" },
+                        { "name": "QrBusinessType", "type":"int" },
+                        { "name": "CreateTime", "type":"timestamp" }
+                    ], 
+                    "dbName": "SP_OPService", 
+                    "url":"mongodb://sp1:28001,sp2:28001/SP_OPService.QrMap",
+                    "query":"{'_id':{ $gt:$start,$lte:$end }}"
+                }
+            }, 
+            "writer": {
+                "name": "hdfswriter", 
+                "parameter": {
+                    "column": [
+                        { "name": "id", "type": "string" },
+                        { "name": "QrID", "type": "string" },
+                        { "name": "MallID", "type": "bigint" },
+                        { "name": "QrString", "type": "string" },
+                        { "name": "QrParam", "type": "string" },
+                        { "name": "IsWx", "type": "boolean" },
+                        { "name": "WXQR_ID", "type": "bigint" },
+						{ "name": "WXQR_ID_Per", "type": "string" },		
+                        { "name": "IsTemp", "type": "boolean" },
+                        { "name": "QrBusinessType", "type":"int" },
+                        { "name": "CreateTime", "type":"timestamp" }						
+                    ], 
+                    "defaultFS": "hdfs://hadoop000:9000",
+                    "fieldDelimiter": "\1",
+                    "fileName": "$filename",
+                    "fileType": "orc",
+                    "path": "/user/root/hive/pqr.db/QrMap",
+                    "writeMode": "append"
+                }
+            }
+        }], 
+        "setting": { "speed": { "channel": 4 } }
+    }
+}
+
+
+
+
+
+
+
+
+
+

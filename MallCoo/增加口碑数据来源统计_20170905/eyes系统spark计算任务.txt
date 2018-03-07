@@ -1,0 +1,137 @@
+eyes系统spark计算任务
+一 脚本部署：
+在服务器/apps/script/appspark目录，任务部署在azkaban，每天八点整开始跑（任务需要在七点之后跑，微信公众平台的接口测试过七点之后才能调到数据）。
+二 脚本结构：
+1 spark任务启动脚本：spark-launch.sh
+
+  a.data_trans.sh脚本，这个是把佳俊每天flume采集的数据从中间表demand.trackpageview,demand.trackevent插入mq.trackpageview和mq.trackevent.
+  b.wxinterface.sh脚本：这个是调微信公众平台的接口，拿到每个商场微信关注数
+  c.启动spark计算任务：spark-submit提交app-start.py
+  
+2 spark计算脚本调度：app-start.py
+
+  a 创建sparkcontext,创建线程锁，保证所有的core会跑满
+  b 在主线程启动prepare0.py，更新每天的appuuid_all和qmiddle.mq_newuuidj这两张表的数据
+  c 把计算需要的appuuid_all,mq.trackpage_view,mq.track_event创建临时表，加载入内存
+  d 用多线程启动register.py，这个线程是计算eyes的app,wx,lapp的用户数指标
+  e 用多线程启动behaviour.py，这个线程是计算eyes的app,wx,lapp的打开次数与时长指标
+  f 用多线程启动active.py，这个线程是计算eyes的app,wx,lapp的用户活跃率指标
+  g 用多线程启动user.py，这个线程是计算eyes的线上运营的注册用户统计指标
+  h 用多线程启动card.py，这个线程是计算eyes的线上运营的商场卡会员指标
+  i 用多线程启动extend.py，这个线程使计算eyes的线上运营的部分数据
+  j 用多线程启动park.py，这个线程是计算eyes的线上运营的车场分析指标
+  k 用多线程启动click.py，这个线程计算eyes的app,wx,lapp的页面点击和模块点击指标
+  l 判断昨天是周日，如果是启动week.py线程，计算eyes的相应的周度指标
+  m 判断今天是每个月一号，如果是启动month.py线程，计算eyes的相应的月度指标
+  n 判断各个线程是否执行完，如果没有主进程等待各个线程执行完。
+  
+  
+
+  
+--data_trans.sh
+
+alter table trackpageview add partition (date ='$today');
+alter table trackpageview drop partition (date ='$remove');
+alter table trackevent add partition (date ='$today');
+alter table trackevent drop partition (date ='$remove');
+
+insert into table mq.trackpageview partition (DATE,MallID) --追加？？
+select apptype
+      ,shopid
+	  ,source
+	  ,presource
+	  ,mark
+	  ,premark
+	  ,uuid
+	  ,userid
+	  ,ip
+	  ,mac
+	  ,mobilesysversion
+	  ,mobilemodel
+	  ,loc
+	  ,city
+	  ,address
+	  ,screenwidth
+	  ,screenheight
+	  ,appversion
+	  ,appversionname
+	  ,imei
+	  ,browserinfo
+	  ,createtime
+	  ,containersource
+	  ,refid
+	  ,refname
+	  ,regexp_replace(to_date(CreateTime),'-','') --动态分区
+	  ,MallID                                     --动态分区
+  from demand.trackpageview 
+ where date = '$yesterday' 
+   and lower(mark) not in ('wsk_lapp/group/malllist'                     -- 商场选择列表页面 对应 action 15114
+                          ,'com.aiguang.mallcoo.mall.malllistactivityv2'
+						  ,'mallselectviewcontroller');
+						  
+
+insert into table mq.trackpageview partition (DATE,MallID) --追加？？
+select apptype
+      ,shopid
+	  ,source
+	  ,presource
+	  ,mark
+	  ,premark
+	  ,uuid
+	  ,userid
+	  ,ip
+	  ,mac
+	  ,mobilesysversion
+	  ,mobilemodel
+	  ,loc
+	  ,city
+	  ,address
+	  ,screenwidth
+	  ,screenheight
+	  ,appversion
+	  ,appversionname
+	  ,imei
+	  ,browserinfo
+	  ,createtime
+	  ,containersource
+	  ,refid
+	  ,refname
+	  ,regexp_replace(to_date(CreateTime),'-','')
+	  ,MallID 
+  from demand.trackpageview 
+ where date = '$yesterday' 
+   and mallid=188    --成都万象城
+   and lower(mark) in ('wsk_lapp/group/malllist'                        -- 商场选择列表页面 对应 action 15114
+                      ,'com.aiguang.mallcoo.mall.malllistactivityv2'
+					  ,'mallselectviewcontroller');
+
+					  
+insert into table mq.trackevent partition (DATE,MallID) 
+select shopid
+      ,apptype
+	  ,uuid
+	  ,source
+	  ,mark
+	  ,refid
+	  ,userid
+	  ,action
+	  ,ip
+	  ,mac
+	  ,mobilesysversion
+	  ,mobilemodel
+	  ,loc
+	  ,city
+	  ,address
+	  ,screenwidth
+	  ,screenheight
+	  ,appversion
+	  ,appversionname
+	  ,imei
+	  ,browserinfo
+	  ,createtime
+	  ,premark
+	  ,containersource
+	  ,regexp_replace(to_date(CreateTime),'-','')
+	  ,MallID 
+  from demand.trackevent 
+ where date = '$yesterday';

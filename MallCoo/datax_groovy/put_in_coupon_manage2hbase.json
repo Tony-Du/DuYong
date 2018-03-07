@@ -1,0 +1,75 @@
+{
+    "job": {
+        "content": [{
+            "reader": {
+                "name": "mallcoo_mongodbreader",
+                "parameter": {
+                    "collectionName": "PutInCouponManage",
+                    "column": [
+                        { "index": 0, "name": "_id", "type":"long" },
+                        { "index": 1, "name": "CVRID", "type":"long" },
+                        { "index": 2, "name": "Type", "type":"int" },
+                        { "index": 3, "name": "MallID", "type":"long" },
+                        { "index": 4, "name": "PICID", "type":"long" },
+                        { "index": 5, "name": "StoreCount", "type":"int" },
+                        { "index": 6, "name": "StoreOverGount", "type":"int" },     
+                        { "index": 7, "name": "ThirdPartyID", "type":"string" },
+                        { "index": 8, "name": "EPMaxGet", "type":"int" },
+                        { "index": 9, "name": "IsEPMaxGetInfinite", "type":"boolean" },                     
+                        { "index": 10, "name": "EDMaxGet", "type":"int" },
+                        { "index": 11, "name": "IsEDMaxGetInfinite", "type":"boolean" },
+                        { "index": 12, "name": "UpdateID", "type":"long" },
+                        { "index": 13, "name": "UpdateName", "type":"string" },                     
+                        { "index": 14, "name": "UpdateTime", "type":"date" },
+                        { "index": 15, "name": "State", "type":"int" }
+                    ],
+                    "dbName": "Coupon",
+                    "url": "$url/Coupon.PutInCouponManage$qs",
+                    "query":"{'UpdateTime':{$gte:ISODate($start),$lt:ISODate($end)}}"
+                }
+            },
+            "writer": {
+                "name": "hbase11xwriter",
+                "parameter": {
+                    "column": [
+                        { "index": 1,  "name": "data:CVRID", "type":"long" },
+                        { "index": 2,  "name": "data:Type", "type":"int" },
+                        { "index": 3,  "name": "data:MallID", "type":"long" },
+                        { "index": 4,  "name": "data:PICID", "type":"long" },
+                        { "index": 5,  "name": "data:StoreCount", "type":"int" },
+                        { "index": 6,  "name": "data:StoreOverGount", "type":"int" },       
+                        { "index": 7,  "name": "data:ThirdPartyID", "type":"string" },
+                        { "index": 8,  "name": "data:EPMaxGet", "type":"int" },
+                        { "index": 9,  "name": "data:IsEPMaxGetInfinite", "type":"boolean" },                       
+                        { "index": 10, "name": "data:EDMaxGet", "type":"int" },
+                        { "index": 11, "name": "data:IsEDMaxGetInfinite", "type":"boolean" },
+                        { "index": 12, "name": "data:UpdateID", "type":"long" },
+                        { "index": 13, "name": "data:UpdateName", "type":"string" },                        
+                        { "index": 14, "name": "data:UpdateTime", "type":"string" },
+                        { "index": 15, "name": "data:State", "type":"int" }
+                    ],
+                    "encoding": "utf-8", 
+                    "hbaseConfig": {
+                        "hbase.cluster.distributed": "true", 
+                        "hbase.rootdir": "hdfs://hadoop000:9000/hbase", 
+                        "hbase.zookeeper.quorum": "hadoop000,hadoop004,hadoop005"
+                    }, 
+                    "mode": "normal", 
+                    "rowkeyColumn": [{ "index":0, "type":"long"}], 
+                    "table": "put_in_coupon_manage",
+                    "nullMode": "empty"
+                }
+            },
+		    "transformer": [
+                { "name": "dx_groovy",
+                  "parameter": { "code": "SimpleDateFormat sdf = new SimpleDateFormat(\"yyyy-MM-dd HH:mm:ss\");
+                                          record.setColumn(14, new StringColumn(sdf.format(record.getColumn(14).asDate()))); //UpdateTime
+                                          return record;",                                            
+                                 "extraPackage":[ "import java.text.SimpleDateFormat;" ] 
+                               }                                 
+                }
+            ]
+        }],
+        "setting": { "speed": { "channel": $channel } }
+    }
+}

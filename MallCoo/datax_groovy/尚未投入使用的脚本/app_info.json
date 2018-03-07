@@ -1,0 +1,48 @@
+{
+    "job": {
+        "content": [{
+            "reader": {
+                "name": "mallcoo_mongodbreader",
+                "parameter": {
+                    "collectionName": "AppInfo",
+                    "column": [
+                        { "name": "ID" },
+                        { "name": "Product_Ver" },
+                        { "name": "Name" },
+                        { "name": "OSType" },
+                        { "name": "AppSettingID" },
+                        { "name": "PushKey" },
+                        { "name": "PushSecret" },
+                        { "name": "AppUrl" },
+                        { "name": "UpdateDownloadUrl" }
+                    ],
+                    "dbName": "Mallcoo",
+                    "url":"$url/Mallcoo.AppInfo$qs"
+                }
+            },
+            "writer": {
+                "name": "hdfswriter",
+                "parameter": {
+                    "column": [
+                        { "name": "ID", "type":"bigint" },
+                        { "name": "Product_Ver", "type":"int" },
+                        { "name": "Name", "type":"string" },
+                        { "name": "OSType", "type":"int" },
+                        { "name": "AppSettingID", "type":"bigint" },
+                        { "name": "PushKey", "type":"string" },
+                        { "name": "PushSecret", "type":"string" },
+                        { "name": "AppUrl", "type":"string" },
+                        { "name": "UpdateDownloadUrl", "type":"string" }
+                    ],
+                    "defaultFS": "hdfs://hadoop000:9000",
+                    "fieldDelimiter": "\1",
+                    "fileName": "$filename",
+                    "fileType": "orc",
+                    "path": "/user/root/hive/mongo.db/appinfo",
+                    "writeMode": "append"
+                }
+            }
+        }],
+        "setting": { "speed": { "channel": $channel } }
+    }
+}

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="3 seconds" packagingData="true">
+    <jmxConfigurator/>
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <!--<target>System.out</target>-->
+        <!--<filter class="ch.qos.logback.classic.filter.ThresholdFilter">-->
+            <!--<level>INFO</level>-->
+        <!--</filter>-->
+        <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+            <evaluator> <!-- 默认为 ch.qos.logback.classic.boolex.JaninoEventEvaluator -->
+                <expression>return formattedMessage.contains("from timer flash in state");</expression>
+            </evaluator>
+            <OnMatch>DENY</OnMatch>
+            <OnMismatch>ACCEPT</OnMismatch>
+        </filter>
+        <encoder>
+            <pattern>%date{yyyy-MM-dd HH:mm:ss.SSS} %highlight(%-6level) %cyan([%logger#%mdc{akkaSource}]): %msg %xEx%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="info" class="ch.qos.logback.core.FileAppender">
+        <file>info.log</file>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
+        <encoder>
+            <pattern>%date{yyyy-MM-dd HH:mm:ss.SSS} %-6level [%logger#%mdc{akkaSource}]: %msg %xEx%n</pattern>
+        </encoder>
+        <append>true</append>
+    </appender>
+
+    <appender name="error" class="ch.qos.logback.core.FileAppender">
+        <file>error.log</file>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+        <encoder>
+            <pattern>%date{yyyy-MM-dd HH:mm:ss.SSS} %-6level [%logger#%mdc{akkaSource}]: %msg %xEx%n</pattern>
+        </encoder>
+        <append>true</append>
+    </appender>
+
+    <appender name="debug" class="ch.qos.logback.core.FileAppender">
+        <file>debug.log</file>
+        <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+            <evaluator>
+                <expression>return formattedMessage.contains("from timer flash in state");</expression>
+            </evaluator>
+            <OnMatch>DENY</OnMatch>
+            <OnMismatch>ACCEPT</OnMismatch>
+        </filter>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>DEBUG</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <encoder>
+            <pattern>%date{yyyy-MM-dd HH:mm:ss.SSS} %-6level [%logger#%mdc{akkaSource}]: %msg %xEx%n</pattern>
+        </encoder>
+        <append>true</append>
+    </appender>
+
+    <appender name="info_asyn" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="info" />
+    </appender>
+    <appender name="error_asyn" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="error" />
+    </appender>
+    <appender name="debuf_asyn" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="debug" />
+    </appender>
+
+    <logger name="org.mongodb" level="ERROR">
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+
+
+    <root level="DEBUG">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="info_asyn"/>
+        <appender-ref ref="error_asyn"/>
+        <appender-ref ref="debuf_asyn"/>
+    </root>
+</configuration>
